@@ -15,7 +15,7 @@ namespace WebApplication1.Repositories
         {
             mongoClient = new MongoClient(connectionString);
             database = mongoClient.GetDatabase("basement");
-            collection = database.GetCollection<Bruger>("Brugerss");
+            collection = database.GetCollection<Bruger>("Brugers");
         }
 
         public void CreateBruger(Bruger bruger)
