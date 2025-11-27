@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
 using WebApplication1.Repositories;
@@ -41,11 +40,4 @@ namespace WebApplication1.Controllers
         }
     }
 }
-=======
-namespace WebApplication1.Controllers;
 
-public class VarerController
-{
-    
-}
->>>>>>> Stashed changes
