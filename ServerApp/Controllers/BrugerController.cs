@@ -18,8 +18,8 @@ public class BrugerController : ControllerBase
     [HttpGet]
     public ActionResult<List<Bruger>> GetAll()
     {
-        var brugere = _repo.GetAll();
-        return Ok(brugere);
+        var bruger = _repo.GetAll();
+        return Ok(bruger);
     }
 
     [HttpPost]
