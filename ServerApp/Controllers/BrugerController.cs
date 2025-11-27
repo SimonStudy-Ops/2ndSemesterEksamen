@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
 using WebApplication1.Repositories;
@@ -48,4 +49,11 @@ public class BrugerController : ControllerBase
 
         return Ok(admin);
     }
+=======
+namespace WebApplication1.Controllers;
+
+public class BrugerController
+{
+    
+>>>>>>> Stashed changes
 }
