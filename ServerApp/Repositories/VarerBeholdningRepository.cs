@@ -1,5 +1,6 @@
 using MongoDB.Driver;
 using WebApplication1.Models;
+using System.Collections.Generic;
 
 namespace WebApplication1.Repositories
 {
@@ -16,6 +17,26 @@ namespace WebApplication1.Repositories
             mongoClient = new MongoClient(connectionString);
             database = mongoClient.GetDatabase("basement");
             collection = database.GetCollection<VarerBeholdning>("VarerBeholdning");
+        }
+
+        public void CreateVarerBeholdning(VarerBeholdning vb)
+        {
+            collection.InsertOne(vb);
+        }
+
+        public void CreateVarerBeholdning(List<VarerBeholdning> vbs)
+        {
+            collection.InsertMany(vbs);
+        }
+
+        public void DeleteAll()
+        {
+            collection.DeleteMany(_ => true);
+        }
+
+        public List<VarerBeholdning> GetAll()
+        {
+            return collection.Find(_ => true).ToList();
         }
     }
 }
