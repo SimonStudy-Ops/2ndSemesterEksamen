@@ -11,12 +11,20 @@ public static class DataStore
     {
         new Bruger
         {
-            Brugerid = 1, Navn = "Simon", tlfnr = "12345678", Mail = "simon@example.com", IsAdmin = true,
+            Brugerid = 1, 
+            Navn = "Simon", 
+            tlfnr = "12345678", 
+            Mail = "simon@example.com", 
+            IsAdmin = true,
             opretelse = new DateOnly(2024, 1, 10)
         },
         new Bruger
         {
-            Brugerid = 2, Navn = "Oskar", tlfnr = "87654321", Mail = "oskar@example.com", IsAdmin = false,
+            Brugerid = 2, 
+            Navn = "Oskar", 
+            tlfnr = "87654321", 
+            Mail = "oskar@example.com", 
+            IsAdmin = false,
             opretelse = new DateOnly(2024, 2, 5)
         },
     };
@@ -77,19 +85,43 @@ public static class DataStore
     {
         new Varer()
         {
-            Varerid = 1, Navn = "Carlsberg", Enhed = "Kasse", Udløbsdato = new DateOnly(2025, 12, 24), Beskrivelse = "Kasse med 24 Carlsberg dåseøl", Billede = "no data", Kategorier = "Øl"
+            Varerid = 1,
+            Navn = "Carlsberg", 
+            Enhed = "Kasse", 
+            Udløbsdato = new DateOnly(2025, 12, 24), 
+            Beskrivelse = "Kasse med 24 Carlsberg dåseøl", 
+            Billede = "no data", 
+            Kategorier = "Øl"
         },
         new Varer()
         {
-        Varerid = 2, Navn = "Smirnoff Vodka", Enhed = "Flaske, 1 L", Udløbsdato = new DateOnly(2026, 10, 10), Beskrivelse = "Flaske Smirnoff vodka", Billede = "no data", Kategorier = "Spiritus" 
+        Varerid = 2, 
+        Navn = "Smirnoff Vodka", 
+        Enhed = "Flaske, 1 L", 
+        Udløbsdato = new DateOnly(2026, 10, 10), 
+        Beskrivelse = "Flaske Smirnoff vodka", 
+        Billede = "no data", 
+        Kategorier = "Spiritus" 
         },
         new Varer()
         {
-            Varerid = 3, Navn = "Redbull", Enhed = "Kasse", Udløbsdato = new DateOnly(2025, 12, 15), Beskrivelse = "Kasse med 24 Redbull dåseøl", Billede = "no data", Kategorier = "Redbull"
+            Varerid = 3, 
+            Navn = "Redbull", 
+            Enhed = "Kasse", 
+            Udløbsdato = new DateOnly(2025, 12, 15), 
+            Beskrivelse = "Kasse med 24 Redbull dåseøl", 
+            Billede = "no data", 
+            Kategorier = "Redbull"
         },
         new Varer()
         {
-            Varerid = 4, Navn = "Appelsinjuice", Enhed = "Karton, 1 L", Udløbsdato = new DateOnly(2026, 01, 20), Beskrivelse = "Karton appelsinjuice fra Rynkeby,", Billede = "no data", Kategorier = "Juice"
+            Varerid = 4, 
+            Navn = "Appelsinjuice", 
+            Enhed = "Karton, 1 L", 
+            Udløbsdato = new DateOnly(2026, 01, 20), 
+            Beskrivelse = "Karton appelsinjuice fra Rynkeby,", 
+            Billede = "no data", 
+            Kategorier = "Juice"
         }
     };
 
