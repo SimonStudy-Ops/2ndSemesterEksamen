@@ -13,7 +13,7 @@ public class Varer
     public DateOnly Udløbsdato { get; set; }
     public string Beskrivelse { get; set; }
     public string Billede { get; set; }
-    public string Kategorier { get; set; } // Embedded
+    public Kategorier Kategorier { get; set; } // Embedded
 }
 
 

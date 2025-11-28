@@ -40,7 +40,7 @@ namespace WebApplication1.Repositories
             collection.DeleteOne(v => v.Varerid == varerId);
         }
 
-        public List<Varer> GetAll()
+        public List<Varer> GetAll() 
         {
             return collection.Find(_ => true).ToList();
         }

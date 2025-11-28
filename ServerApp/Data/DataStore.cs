@@ -69,7 +69,7 @@ public static class DataStore
         },
         new Kategorier()
         {
-            kategoriNavn = "Redbull"
+            kategoriNavn = "Energidrik"
         },
         new Kategorier()
         {
@@ -91,7 +91,10 @@ public static class DataStore
             Udløbsdato = new DateOnly(2025, 12, 24), 
             Beskrivelse = "Kasse med 24 Carlsberg dåseøl", 
             Billede = "no data", 
-            Kategorier = "Øl"
+            Kategorier = new Kategorier()
+            {
+                kategoriNavn = "Øl"
+            }
         },
         new Varer()
         {
@@ -101,7 +104,10 @@ public static class DataStore
         Udløbsdato = new DateOnly(2026, 10, 10), 
         Beskrivelse = "Flaske Smirnoff vodka", 
         Billede = "no data", 
-        Kategorier = "Spiritus" 
+        Kategorier = new Kategorier()
+        {
+            kategoriNavn = "Spiritus"
+        }
         },
         new Varer()
         {
@@ -111,7 +117,10 @@ public static class DataStore
             Udløbsdato = new DateOnly(2025, 12, 15), 
             Beskrivelse = "Kasse med 24 Redbull dåseøl", 
             Billede = "no data", 
-            Kategorier = "Redbull"
+            Kategorier = new Kategorier()
+            {
+                kategoriNavn = "Energidrik"
+            }
         },
         new Varer()
         {
@@ -121,7 +130,10 @@ public static class DataStore
             Udløbsdato = new DateOnly(2026, 01, 20), 
             Beskrivelse = "Karton appelsinjuice fra Rynkeby,", 
             Billede = "no data", 
-            Kategorier = "Juice"
+            Kategorier = new Kategorier()
+            {
+                kategoriNavn = "Juice"
+            }
         }
     };
 
