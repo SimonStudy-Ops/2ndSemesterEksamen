@@ -41,7 +41,7 @@ public static class DataStore
         },
         new Lokalitet
         {
-            LokationId = 3, LokationNavn = "Side lager"
+            LokationId = 3, LokationNavn = "Køkken lager"
         },
         new Lokalitet
         {
@@ -149,7 +149,7 @@ public static class DataStore
                 Lokalitet = new Lokalitet
                 {
                     LokationId = 3,
-                    LokationNavn = "Side lager"
+                    LokationNavn = "Køkken lager"
                 }
             },
             // Redbull i Sodavands lager
