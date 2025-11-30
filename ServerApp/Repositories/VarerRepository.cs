@@ -1,7 +1,7 @@
 using MongoDB.Driver;
 using WebApplication1.Models;
 
-namespace WebApplication1.Repositories
+namespace WebApplication1. Repositories
 {
     public class VarerRepository
     {
@@ -14,25 +14,26 @@ namespace WebApplication1.Repositories
         public VarerRepository()
         {
             mongoClient = new MongoClient(connectionString);
-
-            database = mongoClient.GetDatabase("basement");
-
+            database = mongoClient. GetDatabase("basement");
             collection = database.GetCollection<Varer>("Varer");
         }
 
         public void CreateVarer(Varer vare)
         {
+            // Auto-increment: Find højeste Varerid og tilføj 1
+            var allVarer = collection.Find(_ => true).ToList();
+            int maxId = 0;
+            foreach (var existing in allVarer)
+            {
+                if (existing.Varerid > maxId)
+                {
+                    maxId = existing. Varerid;
+                }
+            }
+            vare.Varerid = maxId + 1;
+            
             collection.InsertOne(vare);
-        }
-
-        public void CreateVarer(List<Varer> varer)
-        {
-            collection.InsertMany(varer);
-        }
-
-        public void DeleteAll()
-        {
-            collection.DeleteMany(_ => true);
+            Console.WriteLine($"Oprettet vare med Varerid: {vare.Varerid}");
         }
 
         public void DeleteById(int varerId)
@@ -44,18 +45,5 @@ namespace WebApplication1.Repositories
         {
             return collection.Find(_ => true).ToList();
         }
-
-        public Varer GetVarerById(int varerId)
-        {
-            var filter = Builders<Varer>.Filter.Eq(v => v.Varerid, varerId);
-            return collection.Find(filter).FirstOrDefault();
-        }
-
-        public void UpdateVarer(Varer vare)
-        {
-            var filter = Builders<Varer>.Filter.Eq(v => v.Varerid, vare.Varerid);
-            collection.ReplaceOne(filter, vare);
-        }
-
     }
 }
