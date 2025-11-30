@@ -5,35 +5,31 @@
 
 <h3>Varelager</h3>
 
-<button class="btn btn-primary" @onclick="OpenCreateDialog">Opret Vare</button>
+<button class="btn btn-primary mb-3" @onclick="OpenCreateDialog">Opret Vare i Lager</button>
 
-@if (varelager == null)
+@if (varerBeholdning == null)
 {
-    <p><em>Loading...</em></p>
+    <p><em>Indlæser...</em></p>
 }
 else
 {
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
-                <th>Varelager ID</th>
+                <th>Beholdning ID</th>
                 <th>Vare Navn</th>
                 <th>Mængde</th>
-                <th>Lokalitet</th>
-                <th>Handlinger</th>
+                <th>Lokation</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in varelager)
+            @foreach (var item in varerBeholdning)
             {
                 <tr>
-                    <td>@item.VarelagerId</td>
+                    <td>@item.VarerbeholdId</td>
                     <td>@item.VarerNavn</td>
-                    <td>@item. Mængde</td>
-                    <td>@item. Lokalitet?. LokationNavn</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteVarelager(item.VarelagerId)">Slet</button>
-                    </td>
+                    <td>@item.Mængde</td>
+                    <td>@(item.Lokalitet?.LokationNavn ?? "Ingen lokation")</td>
                 </tr>
             }
         </tbody>
@@ -51,21 +47,22 @@ else
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Varelager ID</label>
-                        <input type="number" class="form-control" @bind="newVarelager.VarelagerId" />
+                        <label class="form-label">Beholdning ID</label>
+                        <input type="number" class="form-control" @bind="newVarerBeholdning.VarerbeholdId" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Vare ID</label>
-                        <input type="number" class="form-control" @bind="newVarelager.VarerId" />
+                        <label class="form-label">Vare ID (reference)</label>
+                        <input type="number" class="form-control" @bind="newVarerBeholdning.VarerId" />
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Vare Navn</label>
-                        <input type="text" class="form-control" @bind="newVarelager.VarerNavn" />
+                        <input type="text" class="form-control" @bind="newVarerBeholdning.VarerNavn" />
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Mængde</label>
-                        <input type="number" class="form-control" @bind="newVarelager.Mængde" />
+                        <input type="number" class="form-control" @bind="newVarerBeholdning. Mængde" />
                     </div>
+                    <h6 class="mt-3">Lokalitet</h6>
                     <div class="mb-3">
                         <label class="form-label">Lokation ID</label>
                         <input type="number" class="form-control" @bind="lokationId" />
@@ -77,7 +74,7 @@ else
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @onclick="CloseCreateDialog">Annuller</button>
-                    <button type="button" class="btn btn-primary" @onclick="CreateVarelager">Opret</button>
+                    <button type="button" class="btn btn-primary" @onclick="CreateVarerBeholdning">Opret</button>
                 </div>
             </div>
         </div>
@@ -85,25 +82,25 @@ else
 }
 
 @code {
-    private List<Varelager>? varelager;
+    private List<VarerBeholdning>? varerBeholdning;
     private bool showCreateDialog = false;
-    private Varelager newVarelager = new Varelager();
+    private VarerBeholdning newVarerBeholdning = new VarerBeholdning();
     private int lokationId;
     private string lokationNavn = "";
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadVarelager();
+        await LoadVarerBeholdning();
     }
 
-    private async Task LoadVarelager()
+    private async Task LoadVarerBeholdning()
     {
-        varelager = await Http.GetFromJsonAsync<List<Varelager>>("api/Varelager");
+        varerBeholdning = await Http.GetFromJsonAsync<List<VarerBeholdning>>("api/VarerBeholdning");
     }
 
     private void OpenCreateDialog()
     {
-        newVarelager = new Varelager();
+        newVarerBeholdning = new VarerBeholdning();
         lokationId = 0;
         lokationNavn = "";
         showCreateDialog = true;
@@ -114,32 +111,28 @@ else
         showCreateDialog = false;
     }
 
-    private async Task CreateVarelager()
+    private async Task CreateVarerBeholdning()
     {
-        newVarelager.Lokalitet = new Lokalitet
+        // Opret embedded Lokalitet objekt
+        newVarerBeholdning. Lokalitet = new Lokalitet
         {
             LokationId = lokationId,
             LokationNavn = lokationNavn
         };
 
-        await Http.PostAsJsonAsync("api/Varelager", newVarelager);
-        await LoadVarelager();
+        await Http.PostAsJsonAsync("api/VarerBeholdning", newVarerBeholdning);
+        await LoadVarerBeholdning();
         CloseCreateDialog();
     }
 
-    private async Task DeleteVarelager(int id)
+    // Lokale klasser til deserialisering (matcher dine eksisterende models)
+    public class VarerBeholdning
     {
-        await Http.DeleteAsync($"api/Varelager/delete/{id}");
-        await LoadVarelager();
-    }
-
-    public class Varelager
-    {
-        public int VarelagerId { get; set; }
+        public int VarerbeholdId { get; set; }
         public int Mængde { get; set; }
+        public Lokalitet Lokalitet { get; set; }
         public int VarerId { get; set; }
         public string VarerNavn { get; set; }
-        public Lokalitet Lokalitet { get; set; }
     }
 
     public class Lokalitet
