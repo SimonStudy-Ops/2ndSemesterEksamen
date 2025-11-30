@@ -1,0 +1,141 @@
+@page "/Varelager"
+@inject HttpClient Http
+
+<PageTitle>Varelager</PageTitle>
+
+<h3>Varelager</h3>
+
+<button class="btn btn-primary mb-3" @onclick="OpenCreateDialog">Opret Vare i Lager</button>
+
+@if (varerBeholdning == null)
+{
+    <p><em>Indlæser...</em></p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Vare Navn</th>
+                <th>Mængde</th>
+                <th>Lokation</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in varerBeholdning)
+            {
+                <tr>
+                    <td>@item.VarerNavn</td>
+                    <td>@item.Mængde</td>
+                    <td>@(item.Lokalitet?.LokationNavn ?? "Ingen lokation")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (showCreateDialog)
+{
+    <div class="modal" style="display:block; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Opret Ny Vare i Lager</h5>
+                    <button type="button" class="btn-close" @onclick="CloseCreateDialog"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Beholdning ID</label>
+                        <input type="number" class="form-control" @bind="newVarerBeholdning.VarerbeholdId" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Vare ID (reference)</label>
+                        <input type="number" class="form-control" @bind="newVarerBeholdning.VarerId" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Vare Navn</label>
+                        <input type="text" class="form-control" @bind="newVarerBeholdning.VarerNavn" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mængde</label>
+                        <input type="number" class="form-control" @bind="newVarerBeholdning. Mængde" />
+                    </div>
+                    <h6 class="mt-3">Lokalitet</h6>
+                    <div class="mb-3">
+                        <label class="form-label">Lokation ID</label>
+                        <input type="number" class="form-control" @bind="lokationId" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Lokation Navn</label>
+                        <input type="text" class="form-control" @bind="lokationNavn" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseCreateDialog">Annuller</button>
+                    <button type="button" class="btn btn-primary" @onclick="CreateVarerBeholdning">Opret</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<VarerBeholdning>? varerBeholdning;
+    private bool showCreateDialog = false;
+    private VarerBeholdning newVarerBeholdning = new VarerBeholdning();
+    private int lokationId;
+    private string lokationNavn = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadVarerBeholdning();
+    }
+
+    private async Task LoadVarerBeholdning()
+    {
+        varerBeholdning = await Http.GetFromJsonAsync<List<VarerBeholdning>>("api/VarerBeholdning");
+    }
+
+    private void OpenCreateDialog()
+    {
+        newVarerBeholdning = new VarerBeholdning();
+        lokationId = 0;
+        lokationNavn = "";
+        showCreateDialog = true;
+    }
+
+    private void CloseCreateDialog()
+    {
+        showCreateDialog = false;
+    }
+
+    private async Task CreateVarerBeholdning()
+    {
+        // Opret embedded Lokalitet objekt
+        newVarerBeholdning. Lokalitet = new Lokalitet
+        {
+            LokationId = lokationId,
+            LokationNavn = lokationNavn
+        };
+
+        await Http.PostAsJsonAsync("api/VarerBeholdning", newVarerBeholdning);
+        await LoadVarerBeholdning();
+        CloseCreateDialog();
+    }
+
+    // Lokale klasser til deserialisering (matcher dine eksisterende models)
+    public class VarerBeholdning
+    {
+        public int VarerbeholdId { get; set; }
+        public int Mængde { get; set; }
+        public Lokalitet Lokalitet { get; set; }
+        public int VarerId { get; set; }
+        public string VarerNavn { get; set; }
+    }
+
+    public class Lokalitet
+    {
+        public int LokationId { get; set; }
+        public string LokationNavn { get; set; }
+    }
+}
