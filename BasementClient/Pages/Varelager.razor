@@ -16,7 +16,6 @@ else
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Beholdning ID</th>
                 <th>Vare Navn</th>
                 <th>Mængde</th>
                 <th>Lokation</th>
@@ -26,7 +25,6 @@ else
             @foreach (var item in varerBeholdning)
             {
                 <tr>
-                    <td>@item.VarerbeholdId</td>
                     <td>@item.VarerNavn</td>
                     <td>@item.Mængde</td>
                     <td>@(item.Lokalitet?.LokationNavn ?? "Ingen lokation")</td>

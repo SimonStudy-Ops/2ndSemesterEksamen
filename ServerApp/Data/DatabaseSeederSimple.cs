@@ -82,7 +82,6 @@ namespace WebApplication1.Data
                     var doc = new BsonDocument
                     {
                         { "_id", vb.VarerbeholdId },
-                        { "VarerbeholdId", vb.VarerbeholdId },
                         { "Mængde", vb.Mængde },
                         { "Lokalitet", lokalitet },
                         { "VarerId", vb.VarerId },
