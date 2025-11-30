@@ -1,0 +1,62 @@
+@page "/Varelager"
+
+@using BasementClient.Components
+
+<PageTitle>Varelager</PageTitle>
+
+<h3>Varelager</h3>
+
+<table class="table table-striped mt-3">
+    <thead>
+    <tr>
+        <th>Navn</th>
+        <th>Pris</th>
+        <th>Lager</th>
+        <th>Farve</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in varer)
+    {
+        <ProductItem Produkt="item" />
+    }
+    </tbody>
+</table>
+
+<button class="btn btn-primary" @onclick="VisAlle" disabled="@(aktuelVisning == "alle")">Vis Alle</button>
+<button class="btn btn-success" @onclick="VisPaaLager" disabled="@(aktuelVisning == "paaLager")">Vis varer på lager</button>
+<button class="btn btn-info" @onclick="GoToAddProduct">Opret nyt produkt</button>
+
+<ModalDialog @ref="addModalDialog" Title="Opret produkt...">
+    per gik en tur
+</ModalDialog>
+
+@code {
+    private Aflevering2 data = new Aflevering2();
+    private List<Item> varer;
+    private string aktuelVisning = "alle";
+
+    ModalDialog? addModalDialog { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        varer = data.GetItems();
+    }
+
+    private void VisAlle()
+    {
+        varer = data.GetItems();
+        aktuelVisning = "alle";
+    }
+
+    private void VisPaaLager()
+    {
+        varer = data.ItemsInStock();
+        aktuelVisning = "paaLager";
+    }
+
+    private void GoToAddProduct()
+    {
+        addModalDialog?.Open();
+    }
+}
