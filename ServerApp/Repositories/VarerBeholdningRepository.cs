@@ -38,5 +38,12 @@ namespace WebApplication1.Repositories
         {
             return collection.Find(_ => true).ToList();
         }
+        public void UpdateVarerBeholdning(VarerBeholdning vb)
+        {
+            var filter = Builders<VarerBeholdning>.Filter
+                .Eq(x => x.VarerbeholdId, vb.VarerbeholdId);
+
+            collection.ReplaceOne(filter, vb);
+        }
     }
 }
