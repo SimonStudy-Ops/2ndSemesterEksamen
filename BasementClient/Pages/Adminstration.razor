@@ -80,18 +80,19 @@
     // API base
     private const string ApiBase = "https://localhost:27017";
 
-    // JSON options så DateOnly virker
+    // Variabel som skal indeholde indstilling for JSON
     private JsonSerializerOptions jsonOptions = default!;
 
+    // Task som indholder indstillinger for JSON
     protected override async Task OnInitializedAsync()
     {
         // Sæt JSON options (bevar feltnavne og tilføj DateOnly converter)
-        jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = null };
-        jsonOptions.Converters.Add(new DateOnlyJsonConverter());
+        jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = null }; // Feltnavne ændres ikke
+        jsonOptions.Converters.Add(new DateOnlyJsonConverter()); // Tilføjer konverter så DateOnly skrives korrekt. Tal laves til tekst
 
-        await LoadBrugere();
+        await LoadBrugere(); // Kalder funktion som henter brugere fra vores API
     }
-    // Task til at loade brugere når clienten indlæses
+    // Funktion til at loade brugere fra vores API når clienten indlæses
     private async Task LoadBrugere()
     {
         loading = true;
@@ -99,8 +100,8 @@
         try
         {
             var url = $"{ApiBase}/api/Bruger";
-            var result = await Http.GetFromJsonAsync<List<Bruger>>(url, jsonOptions);
-            brugere = result ?? new List<Bruger>();
+            var result = await Http.GetFromJsonAsync<List<Bruger>>(url, jsonOptions); // Sender en request til serveren, får JSON tilbage pg konvertere til liste af bruger objekter
+            brugere = result ?? new List<Bruger>(); // gemmer resultatet
         }
         catch (Exception ex)
         {
@@ -111,7 +112,7 @@
             loading = false;
         }
     }
-    // Task til at tilføje bruger
+    // Funktion til at tilføje bruger
     private async Task AddUser()
     {
         fejlbesked = "";
@@ -129,12 +130,12 @@
             nyBruger.Brugerid = 0;
             nyBruger.opretelse = default;
 
-            var url = $"{ApiBase}/api/Bruger";
-            var resp = await Http.PostAsJsonAsync(url, nyBruger, jsonOptions);
-            resp.EnsureSuccessStatusCode();
+            var url = $"{ApiBase}/api/Bruger"; // API endpoint
+            var resp = await Http.PostAsJsonAsync(url, nyBruger, jsonOptions); // Sender oprettet bruger til Server som JSON
+            resp.EnsureSuccessStatusCode(); // Fejlbesked hvis Server ikke svarer
 
             nyBruger = new Bruger { IsAdmin = false };
-            await LoadBrugere();
+            await LoadBrugere(); // Henter opdateret liste fra server
         }
         catch (Exception ex)
         {
