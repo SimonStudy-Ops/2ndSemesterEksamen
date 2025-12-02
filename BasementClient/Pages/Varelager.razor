@@ -25,6 +25,7 @@ else
                 <th>Vare Navn</th>
                 <th>Mængde</th>
                 <th>Lokation</th>
+                <th>Handlinger</th>
             </tr>
         </thead>
         <tbody>
@@ -34,12 +35,19 @@ else
                     <td>@item.VarerNavn</td>
                     <td>@item.Mængde</td>
                     <td>@(item.Lokalitet?.LokationNavn ?? "Ingen lokation")</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary"
+                                @onclick="@(() => OpenEditDialog(item))">
+                            Rediger
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 }
 
+@* --------- CREATE DIALOG --------- *@
 @if (showCreateDialog)
 {
     <div class="modal" style="display:block; background-color: rgba(0,0,0,0.5);">
@@ -124,11 +132,78 @@ else
     </div>
 }
 
+@* --------- EDIT DIALOG --------- *@
+@if (showEditDialog && editVarerBeholdning is not null)
+{
+    <div class="modal" style="display:block; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rediger vare i lager</h5>
+                    <button type="button" class="btn-close" @onclick="CloseEditDialog"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Beholdning ID</label>
+                        <input type="number" class="form-control" @bind="editVarerBeholdning.VarerbeholdId" readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Vare</label>
+                        <input type="text" class="form-control" @bind="editVarerBeholdning.VarerNavn" readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Mængde</label>
+                        <input type="number" class="form-control" @bind="editVarerBeholdning.Mængde" />
+                    </div>
+
+                    <h6 class="mt-3">Lokalitet</h6>
+
+                    <div class="mb-3">
+                        <label class="form-label">Vælg Lokation</label>
+                        <select class="form-control" @onchange="OnLokationSelected">
+                            <option value="">-- Vælg en lokation --</option>
+                            <option value="1">Bar lager</option>
+                            <option value="2">Sodavands lager</option>
+                            <option value="3">Køkken lager</option>
+                            <option value="4">Bag lager</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Lokation ID</label>
+                        <input type="number" class="form-control" @bind="lokationId" readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Lokation Navn</label>
+                        <input type="text" class="form-control" @bind="lokationNavn" readonly />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseEditDialog">Annuller</button>
+                    <button type="button" class="btn btn-primary" @onclick="SaveVarerBeholdning">Gem</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
+    // data fra API
     private List<VarerBeholdning>? varerBeholdning;
     private List<Varer>? allVarer;
+
+    // create
     private bool showCreateDialog = false;
     private VarerBeholdning newVarerBeholdning = new VarerBeholdning();
+
+    // edit
+    private bool showEditDialog = false;
+    private VarerBeholdning? editVarerBeholdning;
+
+    // delt lokations-state til både create og edit
     private int lokationId;
     private string lokationNavn = "";
     private string searchText = "";
@@ -167,12 +242,15 @@ else
         }
     }
 
+    // ---------- create flow ----------
     private void OpenCreateDialog()
     {
         newVarerBeholdning = new VarerBeholdning();
+
+        // simpelt pseudo-ID (i praksis kommer ID fra databasen)
         Random random = new Random();
         newVarerBeholdning.VarerbeholdId = random.Next(1, 10001);
-        
+
         lokationId = 0;
         lokationNavn = "";
         showCreateDialog = true;
@@ -235,6 +313,57 @@ else
         CloseCreateDialog();
     }
 
+    // ---------- edit flow ----------
+    private void OpenEditDialog(VarerBeholdning item)
+    {
+        // kopi, så vi ikke redigerer direkte i listen
+        editVarerBeholdning = new VarerBeholdning
+        {
+            VarerbeholdId = item.VarerbeholdId,
+            VarerId = item.VarerId,
+            VarerNavn = item.VarerNavn,
+            Mængde = item.Mængde,
+            Lokalitet = item.Lokalitet == null
+                ? new Lokalitet()
+                : new Lokalitet
+                {
+                    LokationId = item.Lokalitet.LokationId,
+                    LokationNavn = item.Lokalitet.LokationNavn
+                }
+        };
+
+        lokationId = editVarerBeholdning.Lokalitet?.LokationId ?? 0;
+        lokationNavn = editVarerBeholdning.Lokalitet?.LokationNavn ?? "";
+
+        showEditDialog = true;
+    }
+
+    private void CloseEditDialog()
+    {
+        showEditDialog = false;
+        editVarerBeholdning = null;
+    }
+
+    private async Task SaveVarerBeholdning()
+    {
+        if (editVarerBeholdning is null)
+            return;
+
+        editVarerBeholdning.Lokalitet = new Lokalitet
+        {
+            LokationId = lokationId,
+            LokationNavn = lokationNavn
+        };
+
+        await Http.PutAsJsonAsync(
+            $"api/VarerBeholdning/{editVarerBeholdning.VarerbeholdId}",
+            editVarerBeholdning);
+
+        await LoadVarerBeholdning();
+        CloseEditDialog();
+    }
+
+    // ---------- lokale modeller ----------
     public class VarerBeholdning
     {
         public int VarerbeholdId { get; set; }
