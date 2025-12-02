@@ -111,6 +111,40 @@
             loading = false;
         }
     }
+    // Task til at tilføje bruger
+    private async Task AddUser()
+    {
+        fejlbesked = "";
+
+        if (string.IsNullOrWhiteSpace(nyBruger.Navn) || string.IsNullOrWhiteSpace(nyBruger.Mail))
+        {
+            fejlbesked = "Navn og Email skal udfyldes.";
+            return;
+        }
+
+        saving = true;
+        try
+        {
+            // Lad server sætte id og oprettelsesdato hvis ikke sat
+            nyBruger.Brugerid = 0;
+            nyBruger.opretelse = default;
+
+            var url = $"{ApiBase}/api/Bruger";
+            var resp = await Http.PostAsJsonAsync(url, nyBruger, jsonOptions);
+            resp.EnsureSuccessStatusCode();
+
+            nyBruger = new Bruger { IsAdmin = false };
+            await LoadBrugere();
+        }
+        catch (Exception ex)
+        {
+            fejlbesked = "Kunne ikke oprette bruger: " + ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
     
     // JSON converter til DateOnly
     public class DateOnlyJsonConverter : System.Text.Json.Serialization.JsonConverter<DateOnly>
