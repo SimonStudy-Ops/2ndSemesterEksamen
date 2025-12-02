@@ -9,24 +9,10 @@
 
 <button class="btn btn-primary mb-3" @onclick="OpenCreateDialog">Opret Vare i Lager</button>
 
-<div class="mb-3" style="max-width: 400px;">
-    <label class="form-label"><strong>Filtrer efter kategori</strong></label>
-    <select class="form-control" @bind="selectedKategori">
-        <option value="">Alle kategorier</option>
-        @foreach (var kat in kategoriOptions)
-        {
-            <option value="@kat">@kat</option>
-        }
-    </select>
-</div>
+<KategoriDropdown KategoriOptions="kategoriOptions"
+                  @bind-SelectedKategori="selectedKategori" />
 
-<div class="mb-3" style="max-width: 400px;">
-    <label class="form-label"><strong>Søg efter vare eller lokation</strong></label>
-    <input class="form-control"
-           placeholder="Søg efter varer eller lokation"
-           @bind="searchText"
-           @bind:event="oninput" />
-</div>
+<VarelagerSearch @bind-SearchText="searchText" />
 
 @if (varerBeholdning == null)
 {
@@ -149,7 +135,6 @@ else
 
     private List<string> kategoriOptions = new();
     private string selectedKategori = "";
-
     private string searchText = "";
 
     protected override async Task OnInitializedAsync()
@@ -208,7 +193,6 @@ else
             return Enumerable.Empty<VarerBeholdning>();
 
         var result = new List<VarerBeholdning>();
-
         var search = (searchText ?? "").Trim().ToLower();
 
         foreach (var item in varerBeholdning)
@@ -313,7 +297,6 @@ else
         public Lokalitet? Lokalitet { get; set; }
         public int VarerId { get; set; }
         public string? VarerNavn { get; set; }
-
         public string? KategoriNavn { get; set; }
     }
 
