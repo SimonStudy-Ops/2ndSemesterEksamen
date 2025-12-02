@@ -1,11 +1,17 @@
 @page "/Varelager"
 @inject HttpClient Http
+@using System.Linq   
 
 <PageTitle>Varelager</PageTitle>
 
 <h3>Varelager</h3>
 
 <button class="btn btn-primary mb-3" @onclick="OpenCreateDialog">Opret Vare i Lager</button>
+
+<input class="form-control mb-3"
+       placeholder="Søg efter varenavn eller lokation..."
+       @bind="searchText"
+       @bind:event="oninput" />
 
 @if (varerBeholdning == null)
 {
@@ -23,7 +29,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in varerBeholdning)
+            @foreach (var item in FilteredeVarerBeholdning)   
             {
                 <tr>
                     <td>@item.VarerNavn</td>
@@ -200,6 +206,17 @@ else
     // delt lokations-state til både create og edit
     private int lokationId;
     private string lokationNavn = "";
+    private string searchText = "";
+
+    private IEnumerable<VarerBeholdning> FilteredeVarerBeholdning =>
+        string.IsNullOrWhiteSpace(searchText)
+            ? varerBeholdning!   
+            : varerBeholdning!
+                .Where(item =>
+                    (item.VarerNavn ?? "")
+                        .Contains(searchText, StringComparison.OrdinalIgnoreCase)
+                    || (item.Lokalitet?.LokationNavn ?? "")
+                        .Contains(searchText, StringComparison.OrdinalIgnoreCase));
 
     protected override async Task OnInitializedAsync()
     {
@@ -353,18 +370,18 @@ else
         public int Mængde { get; set; }
         public Lokalitet? Lokalitet { get; set; }
         public int VarerId { get; set; }
-        public string VarerNavn { get; set; } = "";
+        public string? VarerNavn { get; set; }
     }
 
     public class Lokalitet
     {
         public int LokationId { get; set; }
-        public string LokationNavn { get; set; } = "";
+        public string? LokationNavn { get; set; }
     }
 
     public class Varer
     {
         public int Varerid { get; set; }
-        public string Navn { get; set; } = "";
+        public string? Navn { get; set; }
     }
 }
