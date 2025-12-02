@@ -25,6 +25,7 @@ else
                 <th>Vare Navn</th>
                 <th>Mængde</th>
                 <th>Lokation</th>
+                <th>Handling</th>
             </tr>
         </thead>
         <tbody>
@@ -34,6 +35,11 @@ else
                     <td>@item.VarerNavn</td>
                     <td>@item.Mængde</td>
                     <td>@(item.Lokalitet?.LokationNavn ?? "Ingen lokation")</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" @onclick="() => OpenDetailsDialog(item. VarerId)">
+                            Detaljer
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -124,7 +130,66 @@ else
     </div>
 }
 
+@if (showDetailsDialog && selectedVare != null)
+{
+    <div class="modal" style="display:block; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Vare Detaljer</h5>
+                    <button type="button" class="btn-close" @onclick="CloseDetailsDialog"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Vare Navn:</strong></label>
+                        <p>@selectedVare. Navn</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Beskrivelse:</strong></label>
+                        <p>@selectedVare.Beskrivelse</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Enhed:</strong></label>
+                        <p>@selectedVare.Enhed</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Udløbsdato:</strong></label>
+                        <p>@selectedVare.Udløbsdato.ToString("dd-MM-yyyy")</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Kategori:</strong></label>
+                        <p>@selectedVare.Kategorier?. kategoriNavn</p>
+                    </div>
+
+                    @if (selectedVareBeholdning != null)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Mængde på lager:</strong></label>
+                            <p>@selectedVareBeholdning.Mængde</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Lokation:</strong></label>
+                            <p>@(selectedVareBeholdning. Lokalitet?.LokationNavn ?? "Ingen lokation")</p>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseDetailsDialog">Luk</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
+    private bool showDetailsDialog = false;
+    private Varer?  selectedVare = null;
+    private VarerBeholdning? selectedVareBeholdning = null;
     private List<VarerBeholdning>? varerBeholdning;
     private List<Varer>? allVarer;
     private bool showCreateDialog = false;
@@ -234,6 +299,27 @@ else
         await LoadVarerBeholdning();
         CloseCreateDialog();
     }
+    private async Task OpenDetailsDialog(int varerId)
+    {
+        try
+        {
+            var allVarerFromApi = await Http.GetFromJsonAsync<List<Varer>>("api/Varer");
+            selectedVare = allVarerFromApi?.FirstOrDefault(v => v.Varerid == varerId);
+            selectedVareBeholdning = varerBeholdning?.FirstOrDefault(vb => vb.VarerId == varerId);
+            showDetailsDialog = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fejl ved hentning af varedetaljer: {ex.Message}");
+        }
+    }
+
+    private void CloseDetailsDialog()
+    {
+        showDetailsDialog = false;
+        selectedVare = null;
+        selectedVareBeholdning = null;
+    }
 
     public class VarerBeholdning
     {
@@ -253,6 +339,16 @@ else
     public class Varer
     {
         public int Varerid { get; set; }
-        public string? Navn { get; set; }
+        public string?  Navn { get; set; }
+        public string? Enhed { get; set; }
+        public DateOnly Udløbsdato { get; set; }
+        public string? Beskrivelse { get; set; }
+        public string? Billede { get; set; }
+        public Kategorier? Kategorier { get; set; }
+    }
+
+    public class Kategorier
+    {
+        public string? kategoriNavn { get; set; }
     }
 }
