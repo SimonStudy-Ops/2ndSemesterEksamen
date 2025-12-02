@@ -76,4 +76,19 @@
     private string fejlbesked = "";
     private bool loading = true;
     private bool saving = false;
+    
+    // API base
+    private const string ApiBase = "https://localhost:27017";
+
+    // JSON options så DateOnly virker
+    private JsonSerializerOptions jsonOptions = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Sæt JSON options (bevar feltnavne og tilføj DateOnly converter)
+        jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = null };
+        jsonOptions.Converters.Add(new DateOnlyJsonConverter());
+
+        await LoadBrugere();
+    }
 }
