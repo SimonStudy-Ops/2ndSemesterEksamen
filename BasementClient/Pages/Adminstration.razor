@@ -3,6 +3,37 @@
 
 <h3>Adminstration</h3>
 
+<div class="page">
+<!-- liste af brugere. placeret til venstre -->
+<div class="card">
+    <div class="users-header">Brugere (@brugere.Count)</div>
+        
+    @if (loading)
+    {
+        <div class="muted">Henter brugere...</div>
+    }
+    else if (brugere.Count == 0)
+    {
+        <div class="muted">Ingen brugere endnu.</div>
+    }
+    else
+    {
+        @foreach (var u in brugere.OrderBy(b => b.Navn))
+        {
+            <div class="user-item">
+                <div class="user-name">@u.Navn</div>
+                <div class="muted">
+                    @u.Mail <span> • </span> @u.tlfnr
+                </div>
+                <div class="muted">
+                    <span class="badge">@((u.IsAdmin ? "Admin" : "Employee"))</span>
+                    Joined @u.opretelse.ToString("yyyy-MM-dd")
+                </div>
+            </div>
+        }
+    }
+</div>
+
 @code {
     
 }

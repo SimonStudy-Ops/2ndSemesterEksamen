@@ -16,7 +16,7 @@ builder. Services.AddControllers()
 
 builder. Services.AddSingleton<VarerRepository>();
 builder.Services.AddSingleton<VarerBeholdningRepository>();
-
+builder.Services.AddSingleton<BrugerRepository>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
