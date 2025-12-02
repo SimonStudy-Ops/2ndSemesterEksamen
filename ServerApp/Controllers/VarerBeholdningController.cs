@@ -32,5 +32,17 @@ namespace WebApplication1.Controllers
         {
             _repo.DeleteAll();
         }
+        [HttpPut("{id:int}")]
+        public IActionResult Update(int id, [FromBody] VarerBeholdning vb)
+        {
+            // Simpel validering: id i URL og objekt skal stemme overens
+            if (id != vb.VarerbeholdId)
+            {
+                return BadRequest("Id i URL og objekt stemmer ikke overens.");
+            }
+
+            _repo.UpdateVarerBeholdning(vb);
+            return NoContent(); // 204 – OK uden body
+        }
     }
 }
