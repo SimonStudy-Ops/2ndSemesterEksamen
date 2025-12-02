@@ -36,25 +36,52 @@
                         <p>@SelectedVare.Kategorier?.kategoriNavn</p>
                     </div>
 
-                    @if (SelectedVareBeholdning != null)
-                    {
+                    <div class="mb-3">
+                        <strong>Lokaliteter og Mængder:</strong>
+                        @if (SelectedBeholdninger != null && SelectedBeholdninger.Any())
+                        {
+                            <table class="table table-sm">
+                                <thead>
+                                <tr>
+                                    <th>Lokalitet</th>
+                                    <th>Mængde</th>
+                                    <th>Handling</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var beholdning in SelectedBeholdninger)
+                                {
+                                    <tr>
+                                        <td>@(beholdning.Lokalitet?. LokationNavn ?? "Ingen lokation")</td>
+                                        <td>@beholdning.Mængde</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary" @onclick="() => OnEdit.InvokeAsync(beholdning)">
+                                                Rediger
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                            <p><strong>Total: @SelectedBeholdninger.Sum(b => b.Mængde)</strong></p>
+                        }
+                        else
+                        {
+                            <p>Ingen beholdninger fundet</p>
+                        }
+                    </div>
                         <div class="mb-3">
-                            <strong>Mængde på lager:</strong>
-                            <p>@SelectedVareBeholdning.Mængde</p>
-                        </div>
-
-                        <div class="mb-3">
-                            <strong>Lokation:</strong>
-                            <p>@(SelectedVareBeholdning.Lokalitet?.LokationNavn ?? "Ingen lokation")</p>
-                        </div>
-                    }
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="OnClose">Luk</button>
+                            <strong>Billede:</strong>
+                            <p>@SelectedVare.Billede</p>
+                        </div>    
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="OnClose">Luk</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        
 }
 
 @code {
@@ -65,8 +92,11 @@
     public Varelager.Varer?  SelectedVare { get; set; }
 
     [Parameter]
-    public Varelager.VarerBeholdning? SelectedVareBeholdning { get; set; }
+    public List<Varelager.VarerBeholdning>?  SelectedBeholdninger { get; set; }
 
     [Parameter]
     public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback<Varelager.VarerBeholdning> OnEdit { get; set; }
 }
