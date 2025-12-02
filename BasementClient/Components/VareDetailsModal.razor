@@ -1,0 +1,72 @@
+@using BasementClient.Pages
+
+
+@if (Show && SelectedVare != null)
+{
+    <div class="modal" style="display:block; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Vare Detaljer</h5>
+                    <button type="button" class="btn-close" @onclick="OnClose"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <strong>Vare Navn:</strong>
+                        <p>@SelectedVare.Navn</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Beskrivelse:</strong>
+                        <p>@SelectedVare.Beskrivelse</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Enhed:</strong>
+                        <p>@SelectedVare.Enhed</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Udløbsdato:</strong>
+                        <p>@SelectedVare.Udløbsdato.ToString("dd-MM-yyyy")</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Kategori:</strong>
+                        <p>@SelectedVare.Kategorier?.kategoriNavn</p>
+                    </div>
+
+                    @if (SelectedVareBeholdning != null)
+                    {
+                        <div class="mb-3">
+                            <strong>Mængde på lager:</strong>
+                            <p>@SelectedVareBeholdning.Mængde</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <strong>Lokation:</strong>
+                            <p>@(SelectedVareBeholdning.Lokalitet?.LokationNavn ?? "Ingen lokation")</p>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="OnClose">Luk</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool Show { get; set; }
+
+    [Parameter]
+    public Varelager.Varer?  SelectedVare { get; set; }
+
+    [Parameter]
+    public Varelager.VarerBeholdning? SelectedVareBeholdning { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+}
