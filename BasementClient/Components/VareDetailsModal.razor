@@ -45,14 +45,20 @@
                                 <tr>
                                     <th>Lokalitet</th>
                                     <th>Mængde</th>
+                                    <th>Handling</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @foreach (var beholdning in SelectedBeholdninger)
                                 {
                                     <tr>
-                                        <td>@(beholdning.Lokalitet?.LokationNavn ?? "Ingen lokation")</td>
+                                        <td>@(beholdning.Lokalitet?. LokationNavn ?? "Ingen lokation")</td>
                                         <td>@beholdning.Mængde</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary" @onclick="() => OnEdit.InvokeAsync(beholdning)">
+                                                Rediger
+                                            </button>
+                                        </td>
                                     </tr>
                                 }
                                 </tbody>
@@ -63,6 +69,7 @@
                         {
                             <p>Ingen beholdninger fundet</p>
                         }
+                    </div>
                         <div class="mb-3">
                             <strong>Billede:</strong>
                             <p>@SelectedVare.Billede</p>
@@ -74,7 +81,7 @@
                 </div>
             </div>
         </div>
-        </div>
+        
 }
 
 @code {
@@ -85,8 +92,11 @@
     public Varelager.Varer?  SelectedVare { get; set; }
 
     [Parameter]
-    public List<Varelager.VarerBeholdning>? SelectedBeholdninger { get; set; }
+    public List<Varelager.VarerBeholdning>?  SelectedBeholdninger { get; set; }
 
     [Parameter]
     public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback<Varelager.VarerBeholdning> OnEdit { get; set; }
 }

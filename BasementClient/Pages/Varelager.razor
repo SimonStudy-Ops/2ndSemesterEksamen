@@ -36,17 +36,16 @@ else
             <tr>
                 <td>@gruppe.VarerNavn</td>
                 <td>@gruppe.TotalMængde</td>
-                <td>@gruppe.Beholdninger.Count lokaliteter</td>
+                <td>@gruppe.Beholdninger.Count lokationer</td>
                 <td>
                     <button class="btn btn-info btn-sm" @onclick="() => OpenDetailsDialog(gruppe.VarerId)">
-                        Detaljer
+                       Se Detaljer
                     </button>
                 </td>
-                <td>
-                    <span class="text-muted">Se detaljer</span>
-                </td>
+                
             </tr>
         }
+            
         </tbody>
     </table>
 }
@@ -140,7 +139,8 @@ else
     Show="@showDetailsDialog" 
     SelectedVare="@selectedVare" 
     SelectedBeholdninger="@selectedBeholdninger"
-    OnClose="@CloseDetailsDialog" />
+    OnClose="@CloseDetailsDialog"
+    OnEdit="@HandleEditFromDetails" />
 
 
 
@@ -264,6 +264,12 @@ else
         await LoadAllVarer();
     }
 
+    private void HandleEditFromDetails(VarerBeholdning beholdning)
+    {
+        CloseDetailsDialog();
+        OpenEditDialog(beholdning);
+    }
+    
     private async Task LoadVarerBeholdning()
     {
         varerBeholdning = await Http.GetFromJsonAsync<List<VarerBeholdning>>("api/VarerBeholdning");
