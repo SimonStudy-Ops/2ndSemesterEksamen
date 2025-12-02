@@ -48,7 +48,6 @@ app.MapControllers();
 
 app.Run();
 
-// Custom DateOnly converter
 public class DateOnlyJsonConverter : JsonConverter<DateOnly>
 {
     private const string Format = "yyyy-MM-dd";
