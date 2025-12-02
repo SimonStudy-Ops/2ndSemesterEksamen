@@ -68,5 +68,13 @@
 </div>
 
 @code {
-    
+    public class Bruger
+    {
+        public int Brugerid { get; set; }
+        public string Navn { get; set; } = "";
+        public string tlfnr { get; set; } = "";
+        public string Mail { get; set; } = "";
+        public bool IsAdmin { get; set; }
+        public DateOnly opretelse { get; set; }
+    }
 }
