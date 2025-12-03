@@ -1,5 +1,5 @@
 using MongoDB.Driver;
-using WebApplication1.Models;
+using Core.Models;
 using System.Collections.Generic;
 
 namespace WebApplication1.Repositories
