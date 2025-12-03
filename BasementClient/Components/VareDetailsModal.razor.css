@@ -1,0 +1,21 @@
+.status-expired {
+    background-color: #dc3545 !important;
+    color: white;
+}
+
+.status-warning-2weeks {
+    background-color: #fd7e14 ! important;
+    color: white;
+}
+
+.status-warning-30days {
+    background-color: #ffc107 !important;
+    color: black;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
