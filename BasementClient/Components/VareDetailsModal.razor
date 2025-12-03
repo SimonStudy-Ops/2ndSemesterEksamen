@@ -15,7 +15,11 @@
                         <strong>Vare Navn:</strong>
                         <p>@SelectedVare.Navn</p>
                     </div>
-
+                    
+                    <div class="mb-3">
+                        <strong>Billede:</strong>
+                        <p>@SelectedVare.Billede</p>
+                    </div> 
                     <div class="mb-3">
                         <strong>Beskrivelse:</strong>
                         <p>@SelectedVare.Beskrivelse</p>
@@ -70,10 +74,7 @@
                             <p>Ingen beholdninger fundet</p>
                         }
                     </div>
-                        <div class="mb-3">
-                            <strong>Billede:</strong>
-                            <p>@SelectedVare.Billede</p>
-                        </div>    
+                           
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @onclick="OnClose">Luk</button>
