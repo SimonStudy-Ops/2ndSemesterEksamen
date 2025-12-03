@@ -1,7 +1,7 @@
 using MongoDB.Driver;
 using Core.Models;
 
-namespace WebApplication1. Repositories
+namespace WebApplication1.Repositories
 {
     public class VarerRepository
     {
@@ -14,7 +14,7 @@ namespace WebApplication1. Repositories
         public VarerRepository()
         {
             mongoClient = new MongoClient(connectionString);
-            database = mongoClient. GetDatabase("basement");
+            database = mongoClient.GetDatabase("basement");
             collection = database.GetCollection<Varer>("Varer");
         }
 
@@ -27,7 +27,7 @@ namespace WebApplication1. Repositories
             {
                 if (existing.Varerid > maxId)
                 {
-                    maxId = existing. Varerid;
+                    maxId = existing.Varerid;
                 }
             }
             vare.Varerid = maxId + 1;
