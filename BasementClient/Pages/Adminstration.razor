@@ -26,7 +26,7 @@
             <div class="user-item">
                 <div class="user-name">@u.Navn</div>
                 <div class="muted">
-                    @u.Mail <span> • </span> @u.tlfnr
+                   Mail: @u.Mail <span> • </span> Telefon: @u.tlfnr
                 </div>
                 <div class="muted">
                     <span class="badge">@((u.IsAdmin ? "Admin" : "Employee"))</span>
@@ -78,16 +78,17 @@
     private bool saving = false;
     
     // API base
-    private const string ApiBase = "https://localhost:5299";
+    private const string ApiBase = "http://localhost:5299";
 
     // Variabel som skal indeholde indstilling for JSON
-    private JsonSerializerOptions jsonOptions = default!;
+    private JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     // Task som indholder indstillinger for JSON
     protected override async Task OnInitializedAsync()
     {
-        // Sæt JSON options (bevar feltnavne og tilføj DateOnly converter)
-        jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = null }; // Feltnavne ændres ikke
         jsonOptions.Converters.Add(new DateOnlyJsonConverter()); // Tilføjer konverter så DateOnly skrives korrekt. Tal laves til tekst
 
         await LoadBrugere(); // Kalder funktion som henter brugere fra vores API
