@@ -38,6 +38,7 @@ namespace WebApplication1.Data
                         { "tlfnr", b.tlfnr ?? string.Empty },
                         { "Mail", b.Mail ?? string.Empty },
                         { "IsAdmin", b.IsAdmin },
+                        { "Password", b.Password ?? string.Empty },
                         { "opretelse", b.opretelse.ToDateTime(new TimeOnly(0,0), DateTimeKind. Utc) }
                     };
                     brugerDocs.Add(doc);

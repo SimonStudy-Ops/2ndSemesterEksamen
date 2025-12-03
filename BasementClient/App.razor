@@ -1,10 +1,11 @@
-﻿@using Microsoft.AspNetCore.Components.Routing
-@using BasementClient.Layout
+﻿@using BasementClient.Layout
+@inject NavigationManager Nav
+@inject AuthService Auth
 
 <Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
-        <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
     <NotFound>
         <PageTitle>Not found</PageTitle>
@@ -13,3 +14,28 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        string currentUrl = Nav.Uri.ToLower();
+
+        // 🔥 STOP loop: Hvis man allerede er på login, så redirect ikke!
+        if (currentUrl.EndsWith("/login"))
+            return;
+
+        var user = await Auth.GetUser();
+
+        if (string.IsNullOrEmpty(user))
+        {
+            // Kun redirect hvis vi IKKE allerede står på login
+            Nav.NavigateTo("/login", true);
+        }
+        else
+        {
+            // Hvis logget ind og man prøver at åbne home → send til lager
+            if (currentUrl.EndsWith("/"))
+                Nav.NavigateTo("/varelager", true);
+        }
+    }
+}

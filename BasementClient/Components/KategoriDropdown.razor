@@ -1,0 +1,29 @@
+@using Microsoft.AspNetCore.Components
+
+<div class="mb-3" style="max-width: 400px;">
+    <label class="form-label"><strong>Filtrer efter kategori</strong></label>
+    <select class="form-control" value="@SelectedKategori" @onchange="OnChange">
+        <option value="">Alle kategorier</option>
+        @foreach (var kat in KategoriOptions)
+        {
+            <option value="@kat">@kat</option>
+        }
+    </select>
+</div>
+
+@code {
+    [Parameter]
+    public List<string> KategoriOptions { get; set; } = new();
+
+    [Parameter]
+    public string SelectedKategori { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> SelectedKategoriChanged { get; set; }
+
+    private async Task OnChange(ChangeEventArgs e)
+    {
+        SelectedKategori = e.Value?.ToString() ?? "";
+        await SelectedKategoriChanged.InvokeAsync(SelectedKategori);
+    }
+}
