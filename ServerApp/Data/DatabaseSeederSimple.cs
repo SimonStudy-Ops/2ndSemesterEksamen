@@ -59,7 +59,6 @@ namespace WebApplication1.Data
                         // MongoDB mapper _id til Varerid property automatisk
                         { "Navn", v.Navn ?? string. Empty },
                         { "Enhed", v.Enhed ?? string.Empty },
-                        { "Udløbsdato", v.Udløbsdato.ToDateTime(new TimeOnly(0,0), DateTimeKind.Utc) },
                         { "Beskrivelse", v.Beskrivelse ??  string.Empty },
                         { "Billede", v. Billede ?? string.Empty },
                         { "Kategorier", new BsonDocument { { "kategoriNavn", v.Kategorier?. kategoriNavn ?? string.Empty } } }
