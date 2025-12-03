@@ -2,6 +2,7 @@
 @inject HttpClient Http
 @using System.Net.Http.Json
 @using System.Linq   
+@using Core.Models
 
 
 <PageTitle>Varelager</PageTitle>
@@ -29,20 +30,36 @@ else
                 <th>Vare Navn</th>
                 <th>Mængde</th>
                 <th>Lokation</th>
+                <th>Status</th>
+                <th>Status</th>
                 <th>Handling</th>
-                <th>Handlinger</th>
             </tr>
         </thead>
         <tbody>
         @foreach (var gruppe in GrupperedeVarer)   
         {
-            <tr>
+            var status = UdløbsStatusHelper.GetStatus(gruppe.Udløbsdato);
+            var melding = UdløbsStatusHelper.GetMelding(gruppe.Udløbsdato);
+            var rowClass = status != "ok" ? $"status-{status}" : "";
+        
+            <tr class="@rowClass">
                 <td>@gruppe.VarerNavn</td>
                 <td>@gruppe.TotalMængde</td>
                 <td>@gruppe.Beholdninger.Count lokationer</td>
+                <td>@gruppe.Udløbsdato.ToString("dd-MM-yyyy")</td>
                 <td>
-                    <button class="btn btn-info btn-sm" @onclick="() => OpenDetailsDialog(gruppe.VarerId)">
-                       Se Detaljer
+                    @if (! string.IsNullOrEmpty(melding))
+                    {
+                        <span class="status-badge status-@status">@melding</span>
+                    }
+                    else
+                    {
+                        <span style="color: green;">✓ OK</span>
+                    }
+                </td>
+                <td>
+                    <button class="btn btn-info btn-sm" @onclick="() => OpenDetailsDialog(gruppe. VarerId)">
+                        Se Detaljer
                     </button>
                 </td>
             </tr>
@@ -263,7 +280,7 @@ else
             if (varerBeholdning == null)
                 return Enumerable.Empty<GrupperetVare>();
 
-            var filtreret = FilteredeVarerBeholdning.ToList();
+            var filtreret = FilteredeVarerBeholdning. ToList();
 
             return filtreret
                 .GroupBy(v => v.VarerId)
@@ -271,8 +288,9 @@ else
                 {
                     VarerId = gruppe.Key,
                     VarerNavn = gruppe.First().VarerNavn,
-                    TotalMængde = gruppe.Sum(v => v.Mængde),
-                    Beholdninger = gruppe.ToList()
+                    TotalMængde = gruppe.Sum(v => v. Mængde),
+                    Beholdninger = gruppe.ToList(),
+                    Udløbsdato = allVarer?. FirstOrDefault(a => a.Varerid == gruppe.Key)?. Udløbsdato ?? DateOnly.MinValue
                 })
                 .OrderBy(g => g.VarerNavn);
         }
@@ -473,44 +491,13 @@ else
         BuildKategoriData();
         CloseEditDialog();
     }
-
-    public class VarerBeholdning
-    {
-        public int VarerbeholdId { get; set; }
-        public int Mængde { get; set; }
-        public Lokalitet? Lokalitet { get; set; }
-        public int VarerId { get; set; }
-        public string? VarerNavn { get; set; }
-        public string? KategoriNavn { get; set; }
-    }
-
-    public class Lokalitet
-    {
-        public int LokationId { get; set; }
-        public string? LokationNavn { get; set; }
-    }
-
-    public class Varer
-    {
-        public int Varerid { get; set; }
-        public string?  Navn { get; set; }
-        public string? Enhed { get; set; }
-        public DateOnly Udløbsdato { get; set; }
-        public string? Beskrivelse { get; set; }
-        public string? Billede { get; set; }
-        public Kategorier? Kategorier { get; set; }
-    }
-
-    public class Kategorier
-    {
-        public string? kategoriNavn { get; set; }
-    }
-
+    
     public class GrupperetVare
     {
         public int VarerId { get; set; }
         public string?  VarerNavn { get; set; }
         public int TotalMængde { get; set; }
         public List<VarerBeholdning> Beholdninger { get; set; } = new();
+        public DateOnly Udløbsdato { get; set; }
     }
 }
