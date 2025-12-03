@@ -62,6 +62,11 @@
         <label>Telefon</label>
         <input type="text" @bind="nyBruger.tlfnr" placeholder="+45 12 34 56 78" />
     </div>
+    
+    <div class="form-field">
+        <label>Password</label>
+        <input type="text" @bind="nyBruger.Password" placeholder="..." />
+    </div>
 
     <div class="form-field" style="flex-direction: row; align-items: center; gap: 8px;">
         <input type="checkbox" id="IsAdmin" @bind="nyBruger.IsAdmin" />
@@ -120,9 +125,21 @@
     {
         fejlbesked = "";
 
-        if (string.IsNullOrWhiteSpace(nyBruger.Navn) || string.IsNullOrWhiteSpace(nyBruger.Mail))
+        if (string.IsNullOrWhiteSpace(nyBruger.Navn))
         {
-            fejlbesked = "Navn og Email skal udfyldes.";
+            fejlbesked = "Navn skal udfyldes.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(nyBruger.Mail))
+        {
+            fejlbesked = "Email skal udfyldes.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(nyBruger.Password))
+        {
+            fejlbesked = "Password skal udfyldes.";
             return;
         }
 

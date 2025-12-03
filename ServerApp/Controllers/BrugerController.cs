@@ -28,6 +28,14 @@ public class BrugerController : ControllerBase
         _repo.CreateBruger(bruger);
         return Ok(bruger);
     }
+    [HttpDelete("{id:int}")]
+    public IActionResult DeleteBruger(int id)
+    {
+        // Slet brugeren via repository
+        _repo.DeleteById(id);
+        // 204 betyder: slettet ok, ingen indhold i svar
+        return NoContent();
+    }
 
     [HttpPost("seed-admin")]
     public IActionResult SeedAdmin()
