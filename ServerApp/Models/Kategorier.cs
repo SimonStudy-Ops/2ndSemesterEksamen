@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Core.Models;
+namespace WebApplication1.Models;
 
 public class Kategorier
 {
