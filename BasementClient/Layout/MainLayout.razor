@@ -1,6 +1,5 @@
 ﻿@inherits LayoutComponentBase
 @inject AuthService Auth
-@inject NavigationManager Navigation
 
 <div class="page">
     @if (isLoggedIn)
@@ -11,20 +10,10 @@
     }
 
     <main class="@(!isLoggedIn ? "fullwidth" : "")">
-
-        <!-- TOPBAR -->
-        <div class="top-row px-4 main-topbar">
+        <div class="top-row px-4">
             @if (isLoggedIn)
             {
-                <div class="d-flex align-items-center">
-
-                    <span class="me-3">Hej, @username 👋</span>
-
-                    <button class="logout-button" @onclick="Logout">
-                        <span class="logout-icon">🚪</span> Log ud
-                    </button>
-
-                </div>
+                <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
             }
         </div>
 
@@ -36,26 +25,18 @@
 
 @code {
     private bool isLoggedIn = false;
-    private string? username;
 
     protected override async Task OnInitializedAsync()
     {
-        username = await Auth.GetUser();
-        isLoggedIn = !string.IsNullOrEmpty(username);
+        // Check login ved startup
+        var user = await Auth.GetUser();
+        isLoggedIn = !string.IsNullOrEmpty(user);
 
+        // Lyt til login/logout event → UI opdateres live
         Auth.OnChange += async () =>
         {
-            username = await Auth.GetUser();
-            isLoggedIn = !string.IsNullOrEmpty(username);
+            isLoggedIn = !string.IsNullOrEmpty(await Auth.GetUser());
             InvokeAsync(StateHasChanged);
         };
-    }
-
-    private async Task Logout()
-    {
-        await Auth.Logout();
-        username = null;
-        isLoggedIn = false;
-        Navigation.NavigateTo("/login", true);
     }
 }
