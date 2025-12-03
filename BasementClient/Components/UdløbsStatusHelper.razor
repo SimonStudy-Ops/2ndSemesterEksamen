@@ -1,0 +1,43 @@
+@code {
+    public static string GetStatus(DateOnly udløbsdato)
+    {
+        var idag = DateOnly.FromDateTime(DateTime.Now);
+        var dageTilUdløb = udløbsdato.DayNumber - idag.DayNumber;
+        
+        if (dageTilUdløb < 0)
+        {
+            return "expired";
+        }
+        else if (dageTilUdløb <= 14)
+        {
+            return "warning-2weeks";
+        }
+        else if (dageTilUdløb <= 30)
+        {
+            return "warning-30days";
+        }
+        
+        return "ok";
+    }
+
+    public static string GetMelding(DateOnly udløbsdato)
+    {
+        var idag = DateOnly.FromDateTime(DateTime.Now);
+        var dageTilUdløb = udløbsdato.DayNumber - idag.DayNumber;
+        
+        if (dageTilUdløb < 0)
+        {
+            return $"UDLØBET ({Math.Abs(dageTilUdløb)} dage siden)";
+        }
+        else if (dageTilUdløb <= 14)
+        {
+            return $"UDLØBER SNART ({dageTilUdløb} dage)";
+        }
+        else if (dageTilUdløb <= 30)
+        {
+            return $"Advarsel ({dageTilUdløb} dage)";
+        }
+        
+        return "";
+    }
+}
