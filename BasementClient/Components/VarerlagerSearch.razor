@@ -1,0 +1,23 @@
+@using Microsoft.AspNetCore.Components
+
+<div class="mb-3" style="max-width: 400px;">
+    <label class="form-label"><strong>Søg efter vare eller lokation</strong></label>
+    <input class="form-control"
+           placeholder="Søg efter varer eller lokation"
+           value="@SearchText"
+           @oninput="OnInput" />
+</div>
+
+@code {
+    [Parameter]
+    public string SearchText { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> SearchTextChanged { get; set; }
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        SearchText = e.Value?.ToString() ?? "";
+        await SearchTextChanged.InvokeAsync(SearchText);
+    }
+}
