@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace WebApplication1.Models;
+namespace Core.Models;
 
 public class Varer
 {
