@@ -49,15 +49,36 @@
                                 <tr>
                                     <th>Lokalitet</th>
                                     <th>Mængde</th>
+                                    <th>Udløbsdato</th>
+                                    <th>Status</th>
                                     <th>Handling</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @foreach (var beholdning in SelectedBeholdninger)
                                 {
+                                    var status = UdløbsStatusHelper.GetStatus(beholdning.Udløbsdato);
+                                    var melding = UdløbsStatusHelper.GetMelding(beholdning.Udløbsdato);
+            
                                     <tr>
-                                        <td>@(beholdning.Lokalitet?. LokationNavn ?? "Ingen lokation")</td>
+                                        <td>@(beholdning.Lokalitet?.LokationNavn ?? "Ingen lokation")</td>
                                         <td>@beholdning.Mængde</td>
+                
+                                        
+                                        <td>@beholdning.Udløbsdato.ToString("dd-MM-yyyy")</td>
+                
+                                        
+                                        <td>
+                                            @if (! string.IsNullOrEmpty(melding))
+                                            {
+                                                <span class="status-badge status-@status">@melding</span>
+                                            }
+                                            else
+                                            {
+                                                <span style="color: green;">✓ OK</span>
+                                            }
+                                        </td>
+                
                                         <td>
                                             <button class="btn btn-sm btn-primary" @onclick="() => OnEdit.InvokeAsync(beholdning)">
                                                 Rediger
