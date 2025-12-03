@@ -1,5 +1,5 @@
 @using BasementClient.Pages
-
+@using Core.Models
 
 @if (Show && SelectedVare != null)
 {
@@ -90,14 +90,14 @@
     public bool Show { get; set; }
 
     [Parameter]
-    public Varelager.Varer?  SelectedVare { get; set; }
+    public Varer? SelectedVare { get; set; }
 
     [Parameter]
-    public List<Varelager.VarerBeholdning>?  SelectedBeholdninger { get; set; }
+    public List<VarerBeholdning>? SelectedBeholdninger { get; set; }
 
     [Parameter]
     public EventCallback OnClose { get; set; }
 
     [Parameter]
-    public EventCallback<Varelager.VarerBeholdning> OnEdit { get; set; }
+    public EventCallback<VarerBeholdning> OnEdit { get; set; }
 }
