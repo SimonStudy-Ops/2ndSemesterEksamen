@@ -91,8 +91,7 @@ public static class DataStore
             Varerid = 1,
             Navn = "Carlsberg", 
             Enhed = "Kasse", 
-            Udløbsdato = new DateOnly(2025, 12, 24), 
-            Beskrivelse = "Kasse med 24 Carlsberg dåseøl", 
+            Beskrivelse = "Kasse med 30 Carlsberg Flaskeøl", 
             Billede = "no data", 
             Kategorier = new Kategorier()
             {
@@ -104,7 +103,6 @@ public static class DataStore
         Varerid = 2, 
         Navn = "Smirnoff Vodka", 
         Enhed = "Flaske, 1 L", 
-        Udløbsdato = new DateOnly(2026, 10, 10), 
         Beskrivelse = "Flaske Smirnoff vodka", 
         Billede = "no data", 
         Kategorier = new Kategorier()
@@ -117,7 +115,6 @@ public static class DataStore
             Varerid = 3, 
             Navn = "Redbull", 
             Enhed = "Kasse", 
-            Udløbsdato = new DateOnly(2025, 12, 15), 
             Beskrivelse = "Kasse med 24 Redbull dåseøl", 
             Billede = "no data", 
             Kategorier = new Kategorier()
@@ -130,7 +127,6 @@ public static class DataStore
             Varerid = 4, 
             Navn = "Appelsinjuice", 
             Enhed = "Karton, 1 L", 
-            Udløbsdato = new DateOnly(2026, 01, 20), 
             Beskrivelse = "Karton appelsinjuice fra Rynkeby,", 
             Billede = "no data", 
             Kategorier = new Kategorier()
@@ -148,6 +144,7 @@ public static class DataStore
                 VarerId = 1,                       // reference
                 VarerNavn = "Carlsberg",           // denormaliseret kopi
                 Mængde = 24,
+                Udløbsdato = new DateOnly(2025, 12, 24),
                 Lokalitet = new Lokalitet          // embedded
                 {
                     LokationId = 4,
@@ -174,6 +171,7 @@ public static class DataStore
                 VarerId = 3,
                 VarerNavn = "Redbull",
                 Mængde = 24,
+                Udløbsdato = new DateOnly(2025, 12, 14),
                 Lokalitet = new Lokalitet
                 {
                     LokationId = 2,
@@ -187,6 +185,7 @@ public static class DataStore
                 VarerId = 4,
                 VarerNavn = "Appelsinjuice",
                 Mængde = 10,
+                Udløbsdato = new DateOnly(2025, 12, 10),
                 Lokalitet = new Lokalitet
                 {
                     LokationId = 1,

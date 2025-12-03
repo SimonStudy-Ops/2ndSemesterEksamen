@@ -86,7 +86,8 @@ namespace WebApplication1.Data
                         { "Mængde", vb.Mængde },
                         { "Lokalitet", lokalitet },
                         { "VarerId", vb.VarerId },
-                        { "VarerNavn", vb.VarerNavn ?? string.Empty }
+                        { "VarerNavn", vb.VarerNavn ?? string.Empty },
+                        { "Udløbsdato", vb. Udløbsdato.ToDateTime(new TimeOnly(0,0), DateTimeKind. Utc) }
                     };
                     vbDocs.Add(doc);
                 }

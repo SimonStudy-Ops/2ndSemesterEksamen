@@ -31,7 +31,6 @@ else
                 <th>Mængde</th>
                 <th>Lokation</th>
                 <th>Status</th>
-                <th>Status</th>
                 <th>Handling</th>
             </tr>
         </thead>
@@ -46,7 +45,6 @@ else
                 <td>@gruppe.VarerNavn</td>
                 <td>@gruppe.TotalMængde</td>
                 <td>@gruppe.Beholdninger.Count lokationer</td>
-                <td>@gruppe.Udløbsdato.ToString("dd-MM-yyyy")</td>
                 <td>
                     @if (! string.IsNullOrEmpty(melding))
                     {
@@ -299,7 +297,8 @@ else
                     VarerNavn = gruppe.First().VarerNavn,
                     TotalMængde = gruppe.Sum(v => v.Mængde),
                     Beholdninger = gruppe.ToList(),
-                    Udløbsdato = allVarer?.FirstOrDefault(a => a.Varerid == gruppe.Key)?.Udløbsdato ?? DateOnly.MinValue
+                    // Find den TIDLIGSTE udløbsdato blandt alle beholdninger
+                    Udløbsdato = gruppe.Min(b => b.Udløbsdato)
                 })
                 .OrderBy(g => g.VarerNavn);
         }
