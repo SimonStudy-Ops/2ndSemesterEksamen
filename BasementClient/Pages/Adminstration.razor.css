@@ -11,17 +11,42 @@
     padding: 16px;
 }
 .users-header { font-weight: 600; margin-bottom: 12px; }
+
+/* Bruger-oplysninger står som før: lodret stak */
 .user-item {
-    display: flex; flex-direction: column; gap: 4px;
-    padding: 12px 0; border-bottom: 1px solid #f1f5f9;
+    position: relative;              /* gør det muligt at placere knappen absolut indeni */
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 96px 12px 0;       /* ekstra højre-padding, så teksten ikke rammer knappen */
+    border-bottom: 1px solid #f1f5f9;
 }
 .user-item:last-child { border-bottom: none; }
+
 .user-name { font-weight: 600; }
 .muted { color: #6b7280; font-size: 0.95rem; }
 .badge {
     display: inline-block; padding: 2px 8px; border-radius: 12px;
     font-size: 12px; background: #eef2ff; color: #3730a3; margin-right: 8px;
 }
+
+/* Slet-knappen: helt til højre, rød, runde hjørner, fylder ikke hele linjen */
+.btn-delete {
+    position: absolute;
+    top: 12px;           /* flugter med top-padding af .user-item */
+    right: 0;            /* helt ude til højre */
+    background: #e53935; /* rød */
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;  /* runde hjørner */
+    font-size: 14px;
+    cursor: pointer;
+    width: auto;
+}
+.btn-delete:hover { background: #d32f2f; }
+.btn-delete:active { background: #b71c1c; }
+
 .form-title { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 12px; }
 .form-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
 .form-field input[type="text"],
@@ -34,4 +59,9 @@
 }
 .submit-btn:hover { background: #4338ca; }
 .error { color: #b91c1c; margin-bottom: 8px; }
-@media (max-width: 900px) { .page { grid-template-columns: 1fr; } }
+
+@media (max-width: 900px) {
+    .page { grid-template-columns: 1fr; }
+    /* Hvis knappen bliver for tæt på tekst på små skærme, kan du øge padding-right lidt */
+    .user-item { padding-right: 110px; }
+}
