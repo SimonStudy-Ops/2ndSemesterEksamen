@@ -13,4 +13,7 @@ public class Bruger
     public string Mail {get; set; }
     public bool IsAdmin  { get; set; }
     public DateOnly opretelse { get; set; }
+    
+    public string Password { get; set; }
+
 }

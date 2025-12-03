@@ -1,12 +1,20 @@
 ﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
+@inject AuthService Auth
 
-    <main>
+<div class="page">
+    @if (isLoggedIn)
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
+
+    <main class="@(!isLoggedIn ? "fullwidth" : "")">
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            @if (isLoggedIn)
+            {
+                <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            }
         </div>
 
         <article class="content px-4">
@@ -14,3 +22,21 @@
         </article>
     </main>
 </div>
+
+@code {
+    private bool isLoggedIn = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Check login ved startup
+        var user = await Auth.GetUser();
+        isLoggedIn = !string.IsNullOrEmpty(user);
+
+        // Lyt til login/logout event → UI opdateres live
+        Auth.OnChange += async () =>
+        {
+            isLoggedIn = !string.IsNullOrEmpty(await Auth.GetUser());
+            InvokeAsync(StateHasChanged);
+        };
+    }
+}
