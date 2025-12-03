@@ -1,11 +1,11 @@
 using WebApplication1.Data;
 using WebApplication1.Repositories;
 using System.Text.Json;
-using System.Text.Json. Serialization;
+using System.Text.Json.Serialization;
 using Core.Models;
 using MongoDB.Driver;
 
-var builder = WebApplication. CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder. Services.AddControllers()
@@ -13,12 +13,12 @@ builder. Services.AddControllers()
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         options. JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-        options.JsonSerializerOptions. Converters.Add(new DateOnlyJsonConverter());
+        options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
     });
 
-builder. Services.AddSingleton<VarerRepository>();
+builder.Services.AddSingleton<VarerRepository>();
 builder.Services.AddSingleton<VarerBeholdningRepository>();
-builder. Services.AddSingleton<BrugerRepository>();
+builder.Services.AddSingleton<BrugerRepository>();
 
 builder.Services.AddCors(options =>
 {
@@ -52,7 +52,7 @@ if (app.Environment.IsDevelopment())
     app. MapOpenApi();
 }
 
-app. UseCors("AllowAll");
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
