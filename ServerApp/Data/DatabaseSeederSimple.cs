@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Core.Models;
+using WebApplication1.Models;
 
 namespace WebApplication1.Data
 {

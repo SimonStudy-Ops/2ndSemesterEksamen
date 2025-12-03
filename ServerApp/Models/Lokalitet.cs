@@ -1,4 +1,4 @@
-namespace Core.Models;
+namespace WebApplication1.Models;
 
 public class Lokalitet
 {
