@@ -39,7 +39,7 @@ var mongoConn = "mongodb://localhost:27017";
 var mongoDbName = "basement";
 var client = new MongoClient(mongoConn);
 var db = client.GetDatabase(mongoDbName);
-var brugereCol = db.GetCollection<Bruger>("brugere");
+var brugereCol = db.GetCollection<Bruger>("Brugers");
 
 // Kun seed hvis der ikke er nogen dokumenter
 if (brugereCol.EstimatedDocumentCount() == 0)
