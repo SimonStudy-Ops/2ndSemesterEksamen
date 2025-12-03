@@ -19,14 +19,14 @@ namespace WebApplication1.Data
             var kategoriColl = db.GetCollection<BsonDocument>("Kategorier");
 
             // Slet gamle testdata
-            brugerColl.DeleteMany(Builders<BsonDocument>.Filter. Empty);
+            brugerColl.DeleteMany(Builders<BsonDocument>.Filter.Empty);
             varerColl.DeleteMany(Builders<BsonDocument>.Filter.Empty);
             vbColl.DeleteMany(Builders<BsonDocument>. Filter.Empty);
             kategoriColl.DeleteMany(Builders<BsonDocument>.Filter.Empty);
 
             // Brugere
             var brugerDocs = new List<BsonDocument>();
-            if (DataStore. Brugere != null)
+            if (DataStore.Brugere != null)
             {
                 foreach (var b in DataStore.Brugere)
                 {
@@ -39,7 +39,7 @@ namespace WebApplication1.Data
                         { "Mail", b.Mail ?? string.Empty },
                         { "IsAdmin", b.IsAdmin },
                         { "Password", b.Password ?? string.Empty },
-                        { "opretelse", b.opretelse.ToDateTime(new TimeOnly(0,0), DateTimeKind. Utc) }
+                        { "opretelse", b.opretelse.ToDateTime(new TimeOnly(0,0), DateTimeKind.Utc) }
                     };
                     brugerDocs.Add(doc);
                 }
@@ -54,15 +54,14 @@ namespace WebApplication1.Data
                 {
                     var doc = new BsonDocument
                     {
-                        { "_id", v. Varerid },
+                        { "_id", v.Varerid },
                         // IKKE duplikeret Varerid - kun _id!
                         // MongoDB mapper _id til Varerid property automatisk
-                        { "Navn", v.Navn ?? string. Empty },
+                        { "Navn", v.Navn ?? string.Empty },
                         { "Enhed", v.Enhed ?? string.Empty },
-                        { "Udløbsdato", v.Udløbsdato.ToDateTime(new TimeOnly(0,0), DateTimeKind.Utc) },
                         { "Beskrivelse", v.Beskrivelse ??  string.Empty },
-                        { "Billede", v. Billede ?? string.Empty },
-                        { "Kategorier", new BsonDocument { { "kategoriNavn", v.Kategorier?. kategoriNavn ?? string.Empty } } }
+                        { "Billede", v.Billede ?? string.Empty },
+                        { "Kategorier", new BsonDocument { { "kategoriNavn", v.Kategorier?.kategoriNavn ?? string.Empty } } }
                     };
                     varerDocs.Add(doc);
                 }
@@ -76,18 +75,18 @@ namespace WebApplication1.Data
                 foreach (var vb in DataStore.VarerBeholdning)
                 {
                     var lokalitet = vb.Lokalitet != null
-                        ? new BsonDocument { { "LokationId", vb.Lokalitet.LokationId }, { "LokationNavn", vb. Lokalitet.LokationNavn ??  string.Empty } }
+                        ? new BsonDocument { { "LokationId", vb.Lokalitet.LokationId }, { "LokationNavn", vb.Lokalitet.LokationNavn ??  string.Empty } }
                         : new BsonDocument();
 
                     var doc = new BsonDocument
                     {
-                        { "_id", vb. VarerbeholdId },
+                        { "_id", vb.VarerbeholdId },
                         // IKKE duplikeret VarerbeholdId
                         { "Mængde", vb.Mængde },
                         { "Lokalitet", lokalitet },
                         { "VarerId", vb.VarerId },
                         { "VarerNavn", vb.VarerNavn ?? string.Empty },
-                        { "Udløbsdato", vb. Udløbsdato.ToDateTime(new TimeOnly(0,0), DateTimeKind. Utc) }
+                        { "Udløbsdato", vb.Udløbsdato.ToDateTime(new TimeOnly(0,0), DateTimeKind.Utc) }
                     };
                     vbDocs.Add(doc);
                 }
@@ -96,7 +95,7 @@ namespace WebApplication1.Data
 
             // Kategorier - som separate dokumenter
             var kategoriDocs = new List<BsonDocument>();
-            if (DataStore. Kategorier != null)
+            if (DataStore.Kategorier != null)
             {
                 foreach (var k in DataStore.Kategorier)
                 {
@@ -107,10 +106,10 @@ namespace WebApplication1.Data
                     };
                     kategoriDocs.Add(doc);
                 }
-                if (kategoriDocs.Count > 0) kategoriColl. InsertMany(kategoriDocs);
+                if (kategoriDocs.Count > 0) kategoriColl.InsertMany(kategoriDocs);
             }
 
-            Console. WriteLine("Seed færdig (simpel).");
+            Console.WriteLine("Seed færdig (simpel).");
         }
     }
 }
