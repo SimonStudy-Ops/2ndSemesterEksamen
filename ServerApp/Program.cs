@@ -2,6 +2,8 @@ using WebApplication1.Data;
 using WebApplication1.Repositories;
 using System.Text.Json;
 using System.Text.Json. Serialization;
+using Core.Models;
+using MongoDB.Driver;
 
 var builder = WebApplication. CreateBuilder(args);
 
@@ -31,7 +33,18 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-DatabaseSeederSimple.Seed("mongodb://localhost:27017", "basement");
+// Seed KUN hvis collection er tom (ellers behold eksisterende data)
+var mongoConn = "mongodb://localhost:27017";
+var mongoDbName = "basement";
+var client = new MongoClient(mongoConn);
+var db = client.GetDatabase(mongoDbName);
+var brugereCol = db.GetCollection<Bruger>("brugere");
+
+// Kun seed hvis der ikke er nogen dokumenter
+if (brugereCol.EstimatedDocumentCount() == 0)
+{
+    DatabaseSeederSimple.Seed(mongoConn, mongoDbName);
+}
 
 if (app.Environment.IsDevelopment())
 {
