@@ -1,0 +1,88 @@
+@page "/login"
+@using System.ComponentModel.DataAnnotations
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject AuthService Auth
+
+<div class="login-wrapper">
+
+    <!-- Logo + titel -->
+    <div class="login-header">
+        <img src="images/BasementFullLogo.jpg" alt="Basement Logo" class="login-logo" />
+
+        <h2 class="gradient-text">Basement Lagerstyring</h2>
+
+        <p class="login-subtitle">Log ind for at administrere lageret</p>
+    </div>
+
+    <!-- Login kort -->
+    <div class="login-card">
+        <EditForm Model="model" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <label>Email eller brugernavn</label>
+                <InputText @bind-Value="model.Username" class="input-field" placeholder="Indtast email eller brugernavn" />
+            </div>
+
+            <div class="form-group">
+                <label>Adgangskode</label>
+                <InputText @bind-Value="model.Password" type="password" class="input-field" placeholder="Indtast adgangskode" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <div class="error-box">@ErrorMessage</div>
+            }
+
+            <button class="login-button" type="submit">
+                <span class="bi bi-box-arrow-in-right"></span>
+                Log ind
+            </button>
+        </EditForm>
+    </div>
+
+</div>
+
+@code {
+    private LoginModel model = new();
+    private string? ErrorMessage;
+
+    public class LoginModel
+    {
+        [Required] public string Username { get; set; } = "";
+        [Required] public string Password { get; set; } = "";
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/auth/login", model);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadFromJsonAsync<LoginResponse>();
+
+                await Auth.Login(payload.Username, payload.Token);
+
+                Nav.NavigateTo("/varelager", true);
+            }
+            else
+            {
+                ErrorMessage = "Forkert brugernavn eller adgangskode.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Der opstod en fejl: " + ex.Message;
+        }
+    }
+
+    private class LoginResponse
+    {
+        public string Token { get; set; }
+        public string Username { get; set; }
+    }
+}

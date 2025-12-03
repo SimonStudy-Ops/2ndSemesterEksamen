@@ -15,8 +15,10 @@ public static class DataStore
             Navn = "Simon", 
             tlfnr = "12345678", 
             Mail = "simon@example.com", 
+            Password = "1234" ,
             IsAdmin = true,
             opretelse = new DateOnly(2024, 1, 10)
+            
         },
         new Bruger
         {
@@ -24,6 +26,7 @@ public static class DataStore
             Navn = "Oskar", 
             tlfnr = "87654321", 
             Mail = "oskar@example.com", 
+            Password = "abcd",
             IsAdmin = false,
             opretelse = new DateOnly(2024, 2, 5)
         },

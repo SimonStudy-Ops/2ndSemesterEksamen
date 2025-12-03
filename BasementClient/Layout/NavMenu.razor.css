@@ -42,7 +42,12 @@
         padding-top: 1rem;
     }
 
-    .nav-item:last-of-type {
+.nav-item .fw-bold {
+    font-size: 0.95rem;
+}
+
+
+.nav-item:last-of-type {
         padding-bottom: 1rem;
     }
 
