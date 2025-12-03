@@ -25,9 +25,10 @@
         @foreach (var u in brugere.OrderBy(b => b.Navn))
         {
             <div class="user-item">
+                <button @onclick="() => DeleteUser(u.Brugerid)">Slet</button>
                 <div class="user-name">@u.Navn</div>
                 <div class="muted">
-                   Mail: @u.Mail <span> • </span> Telefon: @u.tlfnr
+                    Mail: @u.Mail <span> • </span> Telefon: @u.tlfnr
                 </div>
                 <div class="muted">
                     <span class="badge">@((u.IsAdmin ? "Admin" : "Employee"))</span>
@@ -146,6 +147,30 @@
         finally
         {
             saving = false;
+        }
+    }
+    
+    // Funktion til at slette en bruger
+    private async Task DeleteUser(int brugerId)
+    {
+        fejlbesked = "";
+
+        try
+        {
+            var url = $"{ApiBase}/api/Bruger/{brugerId}";
+            var resp = await Http.DeleteAsync(url);
+            resp.EnsureSuccessStatusCode();
+
+            // indlæser listen igen fra Database
+            var b = brugere.FirstOrDefault(x => x.Brugerid == brugerId);
+            if (b != null)
+            {
+                await LoadBrugere();
+            }
+        }
+        catch (Exception ex)
+        {
+            fejlbesked = "Kunne ikke slette bruger: " + ex.Message;
         }
     }
     
