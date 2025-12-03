@@ -2,6 +2,8 @@ using WebApplication1.Data;
 using WebApplication1.Repositories;
 using System.Text.Json;
 using System.Text.Json. Serialization;
+using Core.Models;
+using MongoDB.Driver;
 
 var builder = WebApplication. CreateBuilder(args);
 
