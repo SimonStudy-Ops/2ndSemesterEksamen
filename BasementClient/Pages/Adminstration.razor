@@ -25,7 +25,6 @@
         @foreach (var u in brugere.OrderBy(b => b.Navn))
         {
             <div class="user-item">
-                <button @onclick="() => DeleteUser(u.Brugerid)">Slet</button>
                 <div class="user-name">@u.Navn</div>
                 <div class="muted">
                     Mail: @u.Mail <span> • </span> Telefon: @u.tlfnr
@@ -33,6 +32,9 @@
                 <div class="muted">
                     <span class="badge">@((u.IsAdmin ? "Admin" : "Employee"))</span>
                     Joined @u.opretelse.ToString("yyyy-MM-dd")
+                </div>
+                <div class="user-actions">
+                    <button class="btn-delete" @onclick="() => DeleteUser(u.Brugerid)">Slet</button>
                 </div>
             </div>
         }
