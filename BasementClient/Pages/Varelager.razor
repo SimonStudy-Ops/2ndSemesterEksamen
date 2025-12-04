@@ -3,8 +3,6 @@
 @using System.Net.Http.Json
 @using System.Linq   
 @using Core.Models
-
-
 <PageTitle>Varelager</PageTitle>
 
 <h3>Varelager</h3>
@@ -30,34 +28,20 @@ else
                 <th>Vare Navn</th>
                 <th>Mængde</th>
                 <th>Lokation</th>
-                <th>Status</th>
                 <th>Handling</th>
+                <th>Handlinger</th>
             </tr>
         </thead>
         <tbody>
         @foreach (var gruppe in GrupperedeVarer)   
         {
-            var status = UdløbsStatusHelper.GetStatus(gruppe.Udløbsdato);
-            var melding = UdløbsStatusHelper.GetMelding(gruppe.Udløbsdato);
-            var rowClass = status != "ok" ? $"status-{status}" : "";
-        
-            <tr class="@rowClass">
+            <tr>
                 <td>@gruppe.VarerNavn</td>
                 <td>@gruppe.TotalMængde</td>
                 <td>@gruppe.Beholdninger.Count lokationer</td>
                 <td>
-                    @if (! string.IsNullOrEmpty(melding))
-                    {
-                        <span class="status-badge status-@status">@melding</span>
-                    }
-                    else
-                    {
-                        <span style="color: green;">✓ OK</span>
-                    }
-                </td>
-                <td>
                     <button class="btn btn-info btn-sm" @onclick="() => OpenDetailsDialog(gruppe.VarerId)">
-                        Se Detaljer
+                       Se Detaljer
                     </button>
                 </td>
             </tr>
@@ -117,10 +101,6 @@ else
                         <label class="form-label">Mængde</label>
                         <input type="number" class="form-control" @bind="newVarerBeholdning.Mængde" />
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Udløbsdato</label>
-                        <input type="date" class="form-control" @bind="selectedUdløbsdato" />
-                    </div>
                     
                     <h6 class="mt-3">Lokalitet</h6>
                     
@@ -159,7 +139,8 @@ else
     SelectedVare="@selectedVare" 
     SelectedBeholdninger="@selectedBeholdninger"
     OnClose="@CloseDetailsDialog"
-    OnEdit="@HandleEditFromDetails" />
+    OnEdit="@HandleEditFromDetails"
+    OnDelete="@HandleDeleteFromDetails"/>
 
 @if (showEditDialog && editVarerBeholdning is not null)
 {
@@ -184,10 +165,6 @@ else
                     <div class="mb-3">
                         <label class="form-label">Mængde</label>
                         <input type="number" class="form-control" @bind="editVarerBeholdning.Mængde" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Udløbsdato</label>
-                        <input type="date" class="form-control" @bind="editVarerBeholdning.Udløbsdato" />
                     </div>
 
                     <h6 class="mt-3">Lokalitet</h6>
@@ -238,7 +215,6 @@ else
 
     private int lokationId;
     private string lokationNavn = "";
-    private DateOnly selectedUdløbsdato = DateOnly.FromDateTime(DateTime.Now);
 
     private string searchText = "";
     private List<string> kategoriOptions = new();
@@ -296,9 +272,7 @@ else
                     VarerId = gruppe.Key,
                     VarerNavn = gruppe.First().VarerNavn,
                     TotalMængde = gruppe.Sum(v => v.Mængde),
-                    Beholdninger = gruppe.ToList(),
-                    // Find den TIDLIGSTE udløbsdato blandt alle beholdninger
-                    Udløbsdato = gruppe.Min(b => b.Udløbsdato)
+                    Beholdninger = gruppe.ToList()
                 })
                 .OrderBy(g => g.VarerNavn);
         }
@@ -316,7 +290,13 @@ else
         CloseDetailsDialog();
         OpenEditDialog(beholdning);
     }
-    
+    private async Task HandleDeleteFromDetails(int varerbeholdId)
+    {
+        // Brug din eksisterende delete-metode
+        await DeleteVarerBeholdning(varerbeholdId);
+        // Luk detaljer-modal efter sletning
+        CloseDetailsDialog();
+    }
     private async Task LoadVarerBeholdning()
     {
         varerBeholdning = await Http.GetFromJsonAsync<List<VarerBeholdning>>("api/VarerBeholdning");
@@ -368,7 +348,6 @@ else
 
         lokationId = 0;
         lokationNavn = "";
-        selectedUdløbsdato = DateOnly.FromDateTime(DateTime.Now);
         showCreateDialog = true;
     }
 
@@ -386,14 +365,12 @@ else
             {
                 newVarerBeholdning.VarerId = selectedVareLocal.Varerid;
                 newVarerBeholdning.VarerNavn = selectedVareLocal.Navn;
-                selectedUdløbsdato = selectedVareLocal.Udløbsdato;
             }
         }
         else
         {
             newVarerBeholdning.VarerId = 0;
             newVarerBeholdning.VarerNavn = "";
-            selectedUdløbsdato = DateOnly.FromDateTime(DateTime.Now);
         }
     }
 
@@ -426,7 +403,6 @@ else
             LokationNavn = lokationNavn
         };
 
-        newVarerBeholdning.Udløbsdato = selectedUdløbsdato;
         await Http.PostAsJsonAsync("api/VarerBeholdning", newVarerBeholdning);
         await LoadVarerBeholdning();
         BuildKategoriData();
@@ -462,7 +438,6 @@ else
             VarerId = item.VarerId,
             VarerNavn = item.VarerNavn,
             Mængde = item.Mængde,
-            Udløbsdato = item.Udløbsdato,
             Lokalitet = item.Lokalitet == null
                 ? new Lokalitet()
                 : new Lokalitet
@@ -504,6 +479,26 @@ else
         BuildKategoriData();
         CloseEditDialog();
     }
+    private async Task DeleteVarerBeholdning(int varerbeholdId)
+    {
+        var response = await Http.DeleteAsync($"api/VarerBeholdning/{varerbeholdId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadVarerBeholdning();
+            BuildKategoriData();
+        
+            if (showEditDialog && editVarerBeholdning?.VarerbeholdId == varerbeholdId)
+            {
+                CloseEditDialog();
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Fejl ved sletning af VarerBeholdning {varerbeholdId}: {response.StatusCode}");
+        }
+    }
+
     
     public class GrupperetVare
     {
@@ -511,6 +506,5 @@ else
         public string?  VarerNavn { get; set; }
         public int TotalMængde { get; set; }
         public List<VarerBeholdning> Beholdninger { get; set; } = new();
-        public DateOnly Udløbsdato { get; set; }
     }
 }

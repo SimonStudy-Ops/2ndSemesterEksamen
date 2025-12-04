@@ -75,10 +75,18 @@
                                             }
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-primary" @onclick="() => OnEdit.InvokeAsync(beholdning)">
+                                            <button class="btn btn-sm btn-primary"
+                                                    @onclick="() => OnEdit.InvokeAsync(beholdning)">
                                                 Rediger
                                             </button>
+
+                                            <button class="btn btn-sm btn-danger ms-2"
+                                                    @onclick="() => OnDelete.InvokeAsync(beholdning.VarerbeholdId)">
+                                                Slet
+                                            </button>
                                         </td>
+
+                                            
                                     </tr>
                                 }
                                 </tbody>
@@ -113,6 +121,9 @@
 
     [Parameter]
     public EventCallback OnClose { get; set; }
+    
+    [Parameter] public EventCallback<int> OnDelete { get; set; }
+
 
     [Parameter]
     public EventCallback<VarerBeholdning> OnEdit { get; set; }

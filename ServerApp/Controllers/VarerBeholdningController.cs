@@ -32,6 +32,14 @@ namespace WebApplication1.Controllers
         {
             _repo.DeleteAll();
         }
+        
+        [HttpDelete("{id:int}")]
+        public IActionResult Delete(int id)
+        {
+            _repo.DeleteById(id);
+            return NoContent(); 
+        }
+
         [HttpPut("{id:int}")]
         public IActionResult Update(int id, [FromBody] VarerBeholdning vb)
         {

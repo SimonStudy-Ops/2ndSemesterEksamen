@@ -34,6 +34,14 @@ namespace WebApplication1.Repositories
             collection.DeleteMany(_ => true);
         }
 
+        public void DeleteById(int varerbeholdId)
+        {
+            var filter = Builders<VarerBeholdning>.Filter
+                .Eq(x => x.VarerbeholdId, varerbeholdId);
+            
+            collection.DeleteOne(filter);
+        }
+
         public List<VarerBeholdning> GetAll()
         {
             return collection.Find(_ => true).ToList();
