@@ -37,6 +37,12 @@ public class BrugerController : ControllerBase
         return NoContent();
     }
 
+    public IActionResult UpdateBruger([FromBody] Bruger bruger)
+    {
+        _repo.UpdateBruger(bruger);
+        return Ok(bruger);
+    }
+
     [HttpPost("seed-admin")]
     public IActionResult SeedAdmin()
     {
