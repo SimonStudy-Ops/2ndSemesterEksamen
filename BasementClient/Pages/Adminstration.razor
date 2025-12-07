@@ -24,8 +24,10 @@
             @foreach (var u in brugere.OrderBy(b => b.Navn))
             {
                 <div class="user-item">
-                    <button class="btn-edit" @onclick="() => EditUser(u)">Redigér</button>
-                    <button class="btn-delete" @onclick="() => DeleteUser(u.Brugerid)">Slet</button>
+                    <div class="user-actions">
+                        <button class="btn-edit" @onclick="() => EditUser(u)">Redigér</button>
+                        <button class="btn-delete" @onclick="() => DeleteUser(u.Brugerid)">Slet</button>
+                    </div>
                     <div class="user-name">@u.Navn</div>
                     <div class="muted">
                         Mail: @u.Mail <span> • </span> Telefon: @u.tlfnr
@@ -76,48 +78,41 @@
         <button class="submit-btn" @onclick="AddUser" disabled="@saving">Tilføj bruger</button>
     </div>
 </div>
-@if (isEditUser)
-{
-    <div class="modal-backdrop" @onclick="CloseEdit"></div>
-    <div class="modal">
-        <div class="modal-header">
-            <div>Redigér bruger</div>
-            <button class="modal-close" @onclick="CloseEdit">×</button>
+
+<!-- ModalDialog komponent -->
+<ModalDialog @ref="modalRef" Title="Redigér bruger">
+    <div class="modal-body">
+        <div class="form-field">
+            <label>Fulde navn</label>
+            <input type="text" @bind="editModel.Navn" />
         </div>
 
-        <div class="modal-body">
-            <div class="form-field">
-                <label>Fulde navn</label>
-                <input type="text" @bind="editModel.Navn" />
-            </div>
-
-            <div class="form-field">
-                <label>Email</label>
-                <input type="email" @bind="editModel.Mail" />
-            </div>
-
-            <div class="form-field">
-                <label>Telefon</label>
-                <input type="text" @bind="editModel.tlfnr" />
-            </div>
-
-            <div class="form-field" style="flex-direction: row; align-items: center; gap: 8px;">
-                <input type="checkbox" id="edit-IsAdmin" @bind="editModel.IsAdmin" />
-                <label for="edit-IsAdmin">Is Admin</label>
-            </div>
-
-            @if (!string.IsNullOrWhiteSpace(editFejl))
-            {
-                <div class="error">@editFejl</div>
-            }
+        <div class="form-field">
+            <label>Email</label>
+            <input type="email" @bind="editModel.Mail" />
         </div>
 
-        <div class="modal-footer">
-            <button class="btn-edit-save" @onclick="UpdateUser" disabled="@editSaving">Opdatér</button>
-            <button class="btn-secondary" @onclick="CloseEdit">Annullér</button>
+        <div class="form-field">
+            <label>Telefon</label>
+            <input type="text" @bind="editModel.tlfnr" />
         </div>
+
+        <div class="form-field" style="flex-direction: row; align-items: center; gap: 8px;">
+            <input type="checkbox" id="edit-IsAdmin" @bind="editModel.IsAdmin" />
+            <label for="edit-IsAdmin">Is Admin</label>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(editFejl))
+        {
+            <div class="error">@editFejl</div>
+        }
     </div>
-}
+
+    <div class="modal-footer">
+        <button class="btn-edit-save" @onclick="UpdateUser" disabled="@editSaving">Opdatér</button>
+        <button class="btn-secondary" @onclick="CloseEdit">Annullér</button>
+    </div>
+</ModalDialog>
 
 @code {
     private List<Bruger> brugere = new();
@@ -129,10 +124,10 @@
     // API base
     private const string ApiBase = "http://localhost:5299";
     
-    //Til modaldialog
-    private bool isEditUser = false;
+    // Til modaldialog
+    private ModalDialog? modalRef;      // reference til din komponent
     private Bruger? editTarget = null;
-    private Bruger editModel = new(); // en kopi der kan bindes til inputs
+    private Bruger editModel = new();   // en kopi der kan bindes til inputs
     private string editFejl = "";
     private bool editSaving = false;
 
@@ -142,14 +137,12 @@
         PropertyNameCaseInsensitive = true
     };
 
-    // Task som indholder indstillinger for JSON
     protected override async Task OnInitializedAsync()
     {
         jsonOptions.Converters.Add(new DateOnlyJsonConverter()); // Tilføjer konverter så DateOnly skrives korrekt. Tal laves til tekst
-
         await LoadBrugere(); // Kalder funktion som henter brugere fra vores API
     }
-    // Funktion til at loade brugere fra vores API når clienten indlæses
+
     private async Task LoadBrugere()
     {
         loading = true;
@@ -169,7 +162,7 @@
             loading = false;
         }
     }
-    // Funktion til at tilføje bruger
+
     private async Task AddUser()
     {
         fejlbesked = "";
@@ -179,13 +172,11 @@
             fejlbesked = "Navn skal udfyldes.";
             return;
         }
-
         if (string.IsNullOrWhiteSpace(nyBruger.Mail))
         {
             fejlbesked = "Email skal udfyldes.";
             return;
         }
-
         if (string.IsNullOrWhiteSpace(nyBruger.Password))
         {
             fejlbesked = "Password skal udfyldes.";
@@ -195,16 +186,26 @@
         saving = true;
         try
         {
-            // Lad server sætte id og oprettelsesdato hvis ikke sat
-            nyBruger.Brugerid = 0;
-            nyBruger.opretelse = default;
+            // Tildel et simpelt, unikt id: max(Brugerid) + 1
+            var nextId = (brugere.Count == 0)
+                ? 1
+                : brugere
+                    .Where(b => b.Brugerid > 0)
+                    .Select(b => b.Brugerid)
+                    .DefaultIfEmpty(0)
+                    .Max() + 1;
 
-            var url = $"{ApiBase}/api/Bruger"; // API endpoint
-            var resp = await Http.PostAsJsonAsync(url, nyBruger, jsonOptions); // Sender oprettet bruger til Server som JSON
-            resp.EnsureSuccessStatusCode(); // Fejlbesked hvis Server ikke svarer
+            nyBruger.Brugerid = nextId;
+
+            // Sæt oprettelsesdato hvis ikke sat
+            nyBruger.opretelse = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            var url = $"{ApiBase}/api/Bruger";
+            var resp = await Http.PostAsJsonAsync(url, nyBruger, jsonOptions);
+            resp.EnsureSuccessStatusCode();
 
             nyBruger = new Bruger { IsAdmin = false };
-            await LoadBrugere(); // Henter opdateret liste fra server
+            await LoadBrugere();
         }
         catch (Exception ex)
         {
@@ -241,7 +242,7 @@
     }
     
     // Åbn modaldialog til at redigere oplysninger
-    private void EditUser (Bruger b)
+    private void EditUser(Bruger b)
     {
         editFejl = "";
         editTarget = b;
@@ -255,14 +256,59 @@
             opretelse = b.opretelse,
             Password = b.Password // vises ikke i modal inputs, men beholdes hvis server kræver feltet
         };
-        isEditUser = true;
+        
+        modalRef?.Open();        // åbner ModalDialog-komponenten
     }
+
     private void CloseEdit()
     {
-        isEditUser = false;
+        modalRef?.Close();       // lukker ModalDialog-komponenten
         editTarget = null;
         editFejl = "";
         editSaving = false;
+    }
+    
+    // Opdater bruger via PUT-request
+    private async Task UpdateUser()
+    {
+        editFejl = "";
+
+        if (editModel == null || editModel.Brugerid <= 0)
+        {
+            editFejl = "Bruger mangler eller har ugyldigt id.";
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(editModel.Navn))
+        {
+            editFejl = "Navn skal udfyldes.";
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(editModel.Mail))
+        {
+            editFejl = "Email skal udfyldes.";
+            return;
+        }
+
+        editSaving = true;
+        try
+        {
+            var url = $"{ApiBase}/api/Bruger/{editModel.Brugerid}";
+
+            // Send hele Bruger-objektet inkl. Brugerid
+            var resp = await Http.PutAsJsonAsync(url, editModel, jsonOptions);
+            resp.EnsureSuccessStatusCode();
+
+            await LoadBrugere();
+            CloseEdit();
+        }
+        catch (Exception ex)
+        {
+            editFejl = "Kunne ikke opdatere bruger: " + ex.Message;
+        }
+        finally
+        {
+            editSaving = false;
+        }
     }
     
     // JSON converter til DateOnly

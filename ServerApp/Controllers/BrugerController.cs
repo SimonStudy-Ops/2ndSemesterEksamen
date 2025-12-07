@@ -37,8 +37,14 @@ public class BrugerController : ControllerBase
         return NoContent();
     }
 
-    public IActionResult UpdateBruger([FromBody] Bruger bruger)
+    [HttpPut("{id:int}")]
+    public IActionResult UpdateBruger(int id, [FromBody] Bruger bruger)
     {
+        if (bruger == null)
+            return BadRequest("Bruger mangler.");
+
+        bruger.Brugerid = id; // brug altid id fra URL
+
         _repo.UpdateBruger(bruger);
         return Ok(bruger);
     }
