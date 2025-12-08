@@ -37,6 +37,18 @@ public class BrugerController : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("{id:int}")]
+    public IActionResult UpdateBruger(int id, [FromBody] Bruger bruger)
+    {
+        if (bruger == null)
+            return BadRequest("Bruger mangler.");
+
+        bruger.Brugerid = id; // brug altid id fra URL
+
+        _repo.UpdateBruger(bruger);
+        return Ok(bruger);
+    }
+
     [HttpPost("seed-admin")]
     public IActionResult SeedAdmin()
     {

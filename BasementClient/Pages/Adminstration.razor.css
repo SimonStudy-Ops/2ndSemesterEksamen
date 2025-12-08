@@ -12,13 +12,12 @@
 }
 .users-header { font-weight: 600; margin-bottom: 12px; }
 
-/* Bruger-oplysninger står som før: lodret stak */
 .user-item {
-    position: relative;              /* gør det muligt at placere knappen absolut indeni */
+    position: relative;              /* gør det muligt at placere knap-container absolut indeni */
     display: flex;
     flex-direction: column;
     gap: 4px;
-    padding: 12px 96px 12px 0;       /* ekstra højre-padding, så teksten ikke rammer knappen */
+    padding: 12px 110px 12px 0;      /* ekstra højre-padding, så teksten ikke rammer knapperne */
     border-bottom: 1px solid #f1f5f9;
 }
 .user-item:last-child { border-bottom: none; }
@@ -30,19 +29,37 @@
     font-size: 12px; background: #eef2ff; color: #3730a3; margin-right: 8px;
 }
 
-/* Slet-knappen: helt til højre, rød, runde hjørner, fylder ikke hele linjen */
-.btn-delete {
+/* Container til begge knapper – placeret helt ude til højre */
+.user-actions {
     position: absolute;
-    top: 12px;           /* flugter med top-padding af .user-item */
-    right: 0;            /* helt ude til højre */
-    background: #e53935; /* rød */
-    color: #fff;
+    top: 12px;   /* matcher .user-item top-padding */
+    right: 0;    /* helt ude til højre */
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;    /* lille afstand mellem knapperne */
+}
+
+/* Ens størrelse og form på begge knapper */
+.btn-edit,
+.btn-delete {
+    display: inline-block;
+    padding: 8px 14px;     /* samme størrelse for begge knapper */
     border: none;
-    padding: 8px 14px;
-    border-radius: 8px;  /* runde hjørner */
-    font-size: 14px;
+    border-radius: 8px;
     cursor: pointer;
-    width: auto;
+    line-height: 1;        /* undgår at de bliver høje */
+    white-space: nowrap;   /* undgår at teksten bryder */
+}
+
+/* Farver */
+.btn-edit {
+    background-color: #1e90ff;
+    color: #fff;
+}
+
+.btn-delete {
+    background: #e53935;
+    color: #fff;
 }
 .btn-delete:hover { background: #d32f2f; }
 .btn-delete:active { background: #b71c1c; }
@@ -62,6 +79,40 @@
 
 @media (max-width: 900px) {
     .page { grid-template-columns: 1fr; }
-    /* Hvis knappen bliver for tæt på tekst på små skærme, kan du øge padding-right lidt */
-    .user-item { padding-right: 110px; }
+    .user-item { padding-right: 120px; } /* lidt ekstra plads på små skærme */
 }
+/* CSS til Knapper i modalens footer */
+.modal-footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* Ens grundstil for begge knapper */
+.btn-edit-save,
+.btn-secondary {
+    display: inline-block;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;      /* rundede hjørner */
+    cursor: pointer;
+    line-height: 1;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+/* Opdatér-knap */
+.btn-edit-save {
+    background-color: #1e90ff;
+    color: #fff;
+}
+.btn-edit-save:hover { background-color: #1c86ee; }
+.btn-edit-save:active { background-color: #1874cd; }
+
+/* Annullér-knap */
+.btn-secondary {
+    background-color: #e53935;
+    color: #fff;
+}
+.btn-secondary:hover { background-color: #d32f2f; }
+.btn-secondary:active { background-color: #b71c1c; }
