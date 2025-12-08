@@ -5,7 +5,7 @@ using WebApplication1.Repositories;
 namespace WebApplication1.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/varerbeholdning")]
     public class VarerBeholdningController : ControllerBase
     {
         private readonly VarerBeholdningRepository _repo;

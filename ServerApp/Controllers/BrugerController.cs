@@ -5,7 +5,7 @@ using WebApplication1.Repositories;
 namespace WebApplication1.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/bruger")]
 public class BrugerController : ControllerBase
 {
     private readonly BrugerRepository _repo;
