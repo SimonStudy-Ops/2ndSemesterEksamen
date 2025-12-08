@@ -35,6 +35,7 @@ builder.Services.AddOpenApi();
 var app = builder.Build();
 
 // Seed KUN hvis collection er tom (ellers behold eksisterende data)
+/*
 var mongoConn = "mongodb://localhost:27017";
 var mongoDbName = "basement";
 var client = new MongoClient(mongoConn);
@@ -45,8 +46,7 @@ var brugereCol = db.GetCollection<Bruger>("Brugers");
 if (brugereCol.EstimatedDocumentCount() == 0)
 {
     DatabaseSeederSimple.Seed(mongoConn, mongoDbName);
-}
-
+}*/
 if (app.Environment.IsDevelopment())
 {
     app. MapOpenApi();

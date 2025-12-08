@@ -4,7 +4,7 @@ using WebApplication1.Data;
 namespace WebApplication1.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/login")]
 public class AuthController : ControllerBase
 {
     [HttpPost("login")]
