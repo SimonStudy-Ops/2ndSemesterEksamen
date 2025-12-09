@@ -22,7 +22,7 @@ public class AuthService
         return bool.TryParse(isAdminStr, out bool isAdmin) && isAdmin;
     }
 
-    public async Task Login(string username, string token)
+    public async Task Login(string username, string token, bool isAdmin)
     {
         await JS.InvokeVoidAsync("localStorage.setItem", "authUser", username);
         await JS.InvokeVoidAsync("localStorage.setItem", "authToken", token);
