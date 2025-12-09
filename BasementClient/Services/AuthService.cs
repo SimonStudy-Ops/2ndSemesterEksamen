@@ -15,11 +15,18 @@ public class AuthService
     {
         return await JS.InvokeAsync<string>("auth.getUser");
     }
+    
+    public async Task<bool> IsAdmin()
+    {
+        var isAdminStr = await JS.InvokeAsync<string>("localStorage.getItem", "authIsAdmin");
+        return bool.TryParse(isAdminStr, out bool isAdmin) && isAdmin;
+    }
 
     public async Task Login(string username, string token)
     {
         await JS.InvokeVoidAsync("localStorage.setItem", "authUser", username);
         await JS.InvokeVoidAsync("localStorage.setItem", "authToken", token);
+        await JS.InvokeVoidAsync("localStorage.setItem", "authIsAdmin", isAdmin.ToString()); //tager isAdmin med
 
         OnChange?.Invoke(); // 🔥 FÅR NavMenu til at opdatere
     }
@@ -27,6 +34,7 @@ public class AuthService
     public async Task Logout()
     {
         await JS.InvokeVoidAsync("auth.logout");
+        await JS.InvokeVoidAsync("localStorage.removeItem", "authIsAdmin");
 
         OnChange?.Invoke(); // 🔥 FÅR NavMenu til at opdatere
     }
