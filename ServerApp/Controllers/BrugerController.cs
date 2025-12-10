@@ -5,7 +5,7 @@ using WebApplication1.Repositories;
 namespace WebApplication1.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/bruger")]
 public class BrugerController : ControllerBase
 {
     private readonly BrugerRepository _repo;
@@ -35,6 +35,18 @@ public class BrugerController : ControllerBase
         _repo.DeleteById(id);
         // 204 betyder: slettet ok, ingen indhold i svar
         return NoContent();
+    }
+
+    [HttpPut("{id:int}")]
+    public IActionResult UpdateBruger(int id, [FromBody] Bruger bruger)
+    {
+        if (bruger == null)
+            return BadRequest("Bruger mangler.");
+
+        bruger.Brugerid = id; // brug altid id fra URL
+
+        _repo.UpdateBruger(bruger);
+        return Ok(bruger);
     }
 
     [HttpPost("seed-admin")]

@@ -5,7 +5,7 @@ using WebApplication1.Repositories;
 namespace WebApplication1.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/varerbeholdning")]
     public class VarerBeholdningController : ControllerBase
     {
         private readonly VarerBeholdningRepository _repo;
@@ -32,6 +32,14 @@ namespace WebApplication1.Controllers
         {
             _repo.DeleteAll();
         }
+        
+        [HttpDelete("{id:int}")]
+        public IActionResult Delete(int id)
+        {
+            _repo.DeleteById(id);
+            return NoContent(); 
+        }
+
         [HttpPut("{id:int}")]
         public IActionResult Update(int id, [FromBody] VarerBeholdning vb)
         {

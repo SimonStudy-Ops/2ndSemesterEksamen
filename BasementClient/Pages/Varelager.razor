@@ -200,7 +200,8 @@ else
     SelectedVare="@selectedVare" 
     SelectedBeholdninger="@selectedBeholdninger"
     OnClose="@CloseDetailsDialog"
-    OnEdit="@HandleEditFromDetails" />
+    OnEdit="@HandleEditFromDetails"
+    OnDelete="@HandleDeleteFromDetails"/>
 
 @if (showEditDialog && editVarerBeholdning is not null)
 {
@@ -361,7 +362,13 @@ else
         CloseDetailsDialog();
         OpenEditDialog(beholdning);
     }
-    
+    private async Task HandleDeleteFromDetails(int varerbeholdId)
+    {
+        // Brug din eksisterende delete-metode
+        await DeleteVarerBeholdning(varerbeholdId);
+        // Luk detaljer-modal efter sletning
+        CloseDetailsDialog();
+    }
     private async Task LoadVarerBeholdning()
     {
         varerBeholdning = await Http.GetFromJsonAsync<List<VarerBeholdning>>("api/VarerBeholdning");
@@ -578,6 +585,26 @@ else
         BuildKategoriData();
         CloseEditDialog();
     }
+    private async Task DeleteVarerBeholdning(int varerbeholdId)
+    {
+        var response = await Http.DeleteAsync($"api/VarerBeholdning/{varerbeholdId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadVarerBeholdning();
+            BuildKategoriData();
+        
+            if (showEditDialog && editVarerBeholdning?.VarerbeholdId == varerbeholdId)
+            {
+                CloseEditDialog();
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Fejl ved sletning af VarerBeholdning {varerbeholdId}: {response.StatusCode}");
+        }
+    }
+
     
     public class GrupperetVare
     {
