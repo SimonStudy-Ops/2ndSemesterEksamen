@@ -186,7 +186,7 @@
         saving = true;
         try
         {
-            // Tildel et simpelt, unikt id: max(Brugerid) + 1
+            // Tildel et unikt id: max(Brugerid) + 1
             var nextId = (brugere.Count == 0)
                 ? 1
                 : brugere
@@ -197,7 +197,7 @@
 
             nyBruger.Brugerid = nextId;
 
-            // Sæt oprettelsesdato hvis ikke sat
+            // Sæt oprettelsesdato
             nyBruger.opretelse = DateOnly.FromDateTime(DateTime.UtcNow);
 
             var url = $"{ApiBase}/api/Bruger";
