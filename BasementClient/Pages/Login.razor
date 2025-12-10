@@ -65,7 +65,8 @@
             {
                 var payload = await response.Content.ReadFromJsonAsync<LoginResponse>();
 
-                await Auth.Login(payload.Username, payload.Token);
+                await Auth.Login(payload.Username, payload.Token, payload.IsAdmin);
+
 
                 Nav.NavigateTo("/varelager", true);
             }
@@ -84,5 +85,6 @@
     {
         public string Token { get; set; }
         public string Username { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }
