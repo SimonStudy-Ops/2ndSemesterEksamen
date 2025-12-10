@@ -9,11 +9,13 @@
 <PageTitle>Varelager</PageTitle>
 
 <h3>Varelager</h3>
-
-<button class="btn btn-primary mb-3" @onclick="OpenCreateDialog">Opret Vare i Lager</button>
-<!-- Knap der kun vises for admins -->
 @if (isAdmin)
 {
+    <!-- Knapper der kun vises for admins -->
+<button class="btn btn-primary mb-3" @onclick="OpenCreateDialog">Opret Vare i Lager</button>
+
+
+
     <button class="btn btn-success mb-3 ms-2" @onclick="OpenCreateVareDialog">Opret Ny Vare (Admin)</button>
 }
 <KategoriDropdown KategoriOptions="kategoriOptions"
