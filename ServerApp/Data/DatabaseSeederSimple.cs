@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Core.Models;
@@ -8,23 +9,16 @@ namespace WebApplication1.Data
 {
     public static class DatabaseSeederSimple
     {
-        public static void Seed(string connectionString = "mongodb://localhost:27017", string dbName = "basement")
+        public static async Task SeedAsync(IMongoDatabase db)
         {
-            var client = new MongoClient(connectionString);
-            var db = client.GetDatabase(dbName);
-
             var brugerColl = db.GetCollection<BsonDocument>("Brugers");
             var varerColl = db.GetCollection<BsonDocument>("Varer");
             var vbColl = db.GetCollection<BsonDocument>("VarerBeholdning");
             var kategoriColl = db.GetCollection<BsonDocument>("Kategorier");
-
-            // Slet gamle testdata
-            brugerColl.DeleteMany(Builders<BsonDocument>.Filter.Empty);
-            varerColl.DeleteMany(Builders<BsonDocument>.Filter.Empty);
-            vbColl.DeleteMany(Builders<BsonDocument>. Filter.Empty);
-            kategoriColl.DeleteMany(Builders<BsonDocument>.Filter.Empty);
-
-            // Brugere
+            await brugerColl.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
+            await varerColl.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
+            await vbColl.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
+            await kategoriColl.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
             var brugerDocs = new List<BsonDocument>();
             if (DataStore.Brugere != null)
             {
@@ -33,7 +27,6 @@ namespace WebApplication1.Data
                     var doc = new BsonDocument
                     {
                         { "_id", b.Brugerid },
-                        // IKKE duplikeret Brugerid - _id er nok! 
                         { "Navn", b.Navn ?? string.Empty },
                         { "tlfnr", b.tlfnr ?? string.Empty },
                         { "Mail", b.Mail ?? string.Empty },
@@ -43,10 +36,8 @@ namespace WebApplication1.Data
                     };
                     brugerDocs.Add(doc);
                 }
-                if (brugerDocs.Count > 0) brugerColl.InsertMany(brugerDocs);
+                if (brugerDocs.Count > 0) await brugerColl.InsertManyAsync(brugerDocs);
             }
-
-            // Varer
             var varerDocs = new List<BsonDocument>();
             if (DataStore.Varer != null)
             {
@@ -55,33 +46,27 @@ namespace WebApplication1.Data
                     var doc = new BsonDocument
                     {
                         { "_id", v.Varerid },
-                        // IKKE duplikeret Varerid - kun _id!
-                        // MongoDB mapper _id til Varerid property automatisk
                         { "Navn", v.Navn ?? string.Empty },
                         { "Enhed", v.Enhed ?? string.Empty },
-                        { "Beskrivelse", v.Beskrivelse ??  string.Empty },
+                        { "Beskrivelse", v.Beskrivelse ?? string.Empty },
                         { "Billede", v.Billede ?? string.Empty },
                         { "Kategorier", new BsonDocument { { "kategoriNavn", v.Kategorier?.kategoriNavn ?? string.Empty } } }
                     };
                     varerDocs.Add(doc);
                 }
-                if (varerDocs.Count > 0) varerColl.InsertMany(varerDocs);
+                if (varerDocs.Count > 0) await varerColl.InsertManyAsync(varerDocs);
             }
-
-            // VarerBeholdning
             var vbDocs = new List<BsonDocument>();
             if (DataStore.VarerBeholdning != null)
             {
                 foreach (var vb in DataStore.VarerBeholdning)
                 {
                     var lokalitet = vb.Lokalitet != null
-                        ? new BsonDocument { { "LokationId", vb.Lokalitet.LokationId }, { "LokationNavn", vb.Lokalitet.LokationNavn ??  string.Empty } }
+                        ? new BsonDocument { { "LokationId", vb.Lokalitet.LokationId }, { "LokationNavn", vb.Lokalitet.LokationNavn ?? string.Empty } }
                         : new BsonDocument();
-
                     var doc = new BsonDocument
                     {
                         { "_id", vb.VarerbeholdId },
-                        // IKKE duplikeret VarerbeholdId
                         { "Mængde", vb.Mængde },
                         { "Lokalitet", lokalitet },
                         { "VarerId", vb.VarerId },
@@ -90,10 +75,8 @@ namespace WebApplication1.Data
                     };
                     vbDocs.Add(doc);
                 }
-                if (vbDocs.Count > 0) vbColl.InsertMany(vbDocs);
+                if (vbDocs.Count > 0) await vbColl.InsertManyAsync(vbDocs);
             }
-
-            // Kategorier - som separate dokumenter
             var kategoriDocs = new List<BsonDocument>();
             if (DataStore.Kategorier != null)
             {
@@ -101,15 +84,13 @@ namespace WebApplication1.Data
                 {
                     var doc = new BsonDocument
                     {
-                        { "_id", k.kategoriNavn ??  string.Empty }
-                        // IKKE duplikeret kategoriNavn
+                        { "_id", k.kategoriNavn ?? string.Empty }
                     };
                     kategoriDocs.Add(doc);
                 }
-                if (kategoriDocs.Count > 0) kategoriColl.InsertMany(kategoriDocs);
+                if (kategoriDocs.Count > 0) await kategoriColl.InsertManyAsync(kategoriDocs);
             }
-
-            Console.WriteLine("Seed færdig (simpel).");
+            Console.WriteLine("Seed færdig (async).");
         }
     }
 }

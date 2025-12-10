@@ -15,7 +15,7 @@ public class AuthService
     {
         return await JS.InvokeAsync<string>("auth.getUser");
     }
-
+    
     public async Task Login(string username, string token)
     {
         await JS.InvokeVoidAsync("localStorage.setItem", "authUser", username);

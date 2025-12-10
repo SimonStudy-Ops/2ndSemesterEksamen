@@ -6,7 +6,7 @@ namespace WebApplication1.Repositories
 {
     public class VarerBeholdningRepository
     {
-        private string connectionString = "mongodb://localhost:27017";
+        private string connectionString = "mongodb+srv://eaa24mofh_db_user:mohamed123@2ndsemestereksamen.ghi4mwz.mongodb.net/?appName=2ndsemestereksamen";
 
         IMongoClient mongoClient;
         IMongoDatabase database;
