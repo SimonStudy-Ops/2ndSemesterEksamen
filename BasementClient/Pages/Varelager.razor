@@ -1,21 +1,20 @@
 @page "/Varelager"
-@inject AuthService Auth
 @inject HttpClient Http
 @inject AuthService Auth
 @using System.Net.Http.Json
 @using System.Linq   
 @using Core.Models
 
+
 <PageTitle>Varelager</PageTitle>
 
 <h3>Varelager</h3>
-
-<!-- Knap der kun vises for admins -->
 @if (isAdmin)
 {
-    <button class="btn btn-primary mb-3" @onclick="OpenCreateDialog">
-        Opret Varebeholding i Lager
-    </button>
+    <!-- Knapper der kun vises for admins -->
+<button class="btn btn-primary mb-3" @onclick="OpenCreateDialog">Opret Vare i Lager</button>
+
+
 
     <button class="btn btn-success mb-3 ms-2" @onclick="OpenCreateVareDialog">Opret Ny Vare (Admin)</button>
 }
@@ -24,7 +23,7 @@
                   SelectedKategoriChanged="OnSelectedKategoriChanged" />
 
 <VarerlagerSearch SearchText="@searchText"
-                  SearchTextChanged="OnSearchTextChanged" />
+                 SearchTextChanged="OnSearchTextChanged" />
 
 @if (varerBeholdning == null)
 {
@@ -39,49 +38,40 @@ else
                 <th>Mængde</th>
                 <th>Lokation</th>
                 <th>Status</th>
-
-                @if (isAdmin)
-                {
-                    <th>Handling</th>
-                }
+                <th>Handling</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var gruppe in GrupperedeVarer)   
-            {
-                var status = UdløbsStatusHelper.GetStatus(gruppe.Udløbsdato);
-                var melding = UdløbsStatusHelper.GetMelding(gruppe.Udløbsdato);
-                var rowClass = status != "ok" ? $"status-{status}" : "";
-
-                <tr class="@rowClass">
-                    <td>@gruppe.VarerNavn</td>
-                    <td>@gruppe.TotalMængde</td>
-                    <td>@gruppe.Beholdninger.Count lokationer</td>
-                    <td>
-                        @if (!string.IsNullOrEmpty(melding))
-                        {
-                            <span class="status-badge status-@status">@melding</span>
-                        }
-                        else
-                        {
-                            <span style="color: green;">✓ OK</span>
-                        }
-                    </td>
-
-                    @if (isAdmin)
+        @foreach (var gruppe in GrupperedeVarer)   
+        {
+            var status = UdløbsStatusHelper.GetStatus(gruppe.Udløbsdato);
+            var melding = UdløbsStatusHelper.GetMelding(gruppe.Udløbsdato);
+            var rowClass = status != "ok" ? $"status-{status}" : "";
+        
+            <tr class="@rowClass">
+                <td>@gruppe.VarerNavn</td>
+                <td>@gruppe.TotalMængde</td>
+                <td>@gruppe.Beholdninger.Count lokationer</td>
+                <td>
+                    @if (! string.IsNullOrEmpty(melding))
                     {
-                        <td>
-                            <button class="btn btn-info btn-sm" @onclick="() => OpenDetailsDialog(gruppe.VarerId)">
-                                Se Detaljer
-                            </button>
-                        </td>
+                        <span class="status-badge status-@status">@melding</span>
                     }
-                </tr>
-            }
+                    else
+                    {
+                        <span style="color: green;">✓ OK</span>
+                    }
+                </td>
+                <td>
+                    <button class="btn btn-info btn-sm" @onclick="() => OpenDetailsDialog(gruppe.VarerId)">
+                        Se Detaljer
+                    </button>
+                </td>
+            </tr>
+        }
         </tbody>
     </table>
 }
-
 
 @if (showCreateDialog)
 {
@@ -277,7 +267,6 @@ else
 }
 
 @code {
-    private bool isAdmin = false;     
     private bool showDetailsDialog = false;
     private Varer?  selectedVare = null;
     private VarerBeholdning? selectedVareBeholdning = null;
