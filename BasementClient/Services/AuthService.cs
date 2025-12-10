@@ -1,41 +1,52 @@
-using Microsoft.JSInterop;
+using Blazored.LocalStorage;
 
 public class AuthService
 {
-    private readonly IJSRuntime JS;
+    private readonly ILocalStorageService _localStorage;
 
-    public event Action OnChange;
+    public event Action? OnChange;
 
-    public AuthService(IJSRuntime js)
+    public AuthService(ILocalStorageService localStorage)
     {
-        JS = js;
+        _localStorage = localStorage;
     }
 
     public async Task<string?> GetUser()
     {
-        return await JS.InvokeAsync<string>("auth.getUser");
+        return await _localStorage.GetItemAsync<string>("authUser");
     }
-    
+
     public async Task<bool> IsAdmin()
     {
-        var isAdminStr = await JS.InvokeAsync<string>("localStorage.getItem", "authIsAdmin");
-        return bool.TryParse(isAdminStr, out bool isAdmin) && isAdmin;
+        return await _localStorage.GetItemAsync<bool>("authIsAdmin");
+    }
+
+    public async Task<string?> GetToken()
+    {
+        return await _localStorage.GetItemAsync<string>("authToken");
     }
 
     public async Task Login(string username, string token, bool isAdmin)
     {
-        await JS.InvokeVoidAsync("localStorage.setItem", "authUser", username);
-        await JS.InvokeVoidAsync("localStorage.setItem", "authToken", token);
-        await JS.InvokeVoidAsync("localStorage.setItem", "authIsAdmin", isAdmin.ToString()); //tager isAdmin med
+        await _localStorage.SetItemAsync("authUser", username);
+        await _localStorage.SetItemAsync("authToken", token);
+        await _localStorage.SetItemAsync("authIsAdmin", isAdmin);
 
-        OnChange?.Invoke(); // 🔥 FÅR NavMenu til at opdatere
+        OnChange?.Invoke();
     }
 
     public async Task Logout()
     {
-        await JS.InvokeVoidAsync("auth.logout");
-        await JS.InvokeVoidAsync("localStorage.removeItem", "authIsAdmin");
+        await _localStorage.RemoveItemAsync("authUser");
+        await _localStorage.RemoveItemAsync("authToken");
+        await _localStorage.RemoveItemAsync("authIsAdmin");
 
-        OnChange?.Invoke(); // 🔥 FÅR NavMenu til at opdatere
+        OnChange?.Invoke();
+    }
+
+    public async Task<bool> IsLoggedIn()
+    {
+        var token = await GetToken();
+        return !string.IsNullOrEmpty(token);
     }
 }
