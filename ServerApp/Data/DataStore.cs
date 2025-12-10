@@ -3,85 +3,49 @@ using Core.Models;
 
 namespace WebApplication1.Data;
 
-// Ét sted hvor alt hard-coded data ligger.
 public static class DataStore
 {
-    // To hard-codede Brugere
     public static List<Bruger> Brugere = new()
     {
         new Bruger
         {
-            Brugerid = 1, 
-            Navn = "Simon", 
-            tlfnr = "12345678", 
-            Mail = "simon@example.com", 
-            Password = "1234" ,
+            Brugerid = 1,
+            Navn = "Simon",
+            tlfnr = "12345678",
+            Mail = "simon@example.com",
+            Password = "1234",
             IsAdmin = true,
             opretelse = new DateOnly(2024, 1, 10)
-            
         },
         new Bruger
         {
-            Brugerid = 2, 
-            Navn = "Oskar", 
-            tlfnr = "87654321", 
-            Mail = "oskar@example.com", 
+            Brugerid = 2,
+            Navn = "Oskar",
+            tlfnr = "87654321",
+            Mail = "oskar@example.com",
             Password = "abcd",
             IsAdmin = false,
             opretelse = new DateOnly(2024, 2, 5)
-        },
+        }
     };
-    // Hard-coded lokaliteter
+
     public static List<Lokalitet> Lokationer = new()
     {
-        new Lokalitet
-        {
-            LokationId = 1, LokationNavn = "Bar lager"
-        },
-        new Lokalitet
-        {
-            LokationId = 2, LokationNavn = "Sodavands lager"
-        },
-        new Lokalitet
-        {
-            LokationId = 3, LokationNavn = "Køkken lager"
-        },
-        new Lokalitet
-        {
-            LokationId = 4, LokationNavn = "Bag lager"
-        },
+        new Lokalitet { LokationId = 1, LokationNavn = "Bar lager" },
+        new Lokalitet { LokationId = 2, LokationNavn = "Sodavands lager" },
+        new Lokalitet { LokationId = 3, LokationNavn = "Køkken lager" },
+        new Lokalitet { LokationId = 4, LokationNavn = "Bag lager" }
     };
 
     public static List<Kategorier> Kategorier = new()
     {
-        new Kategorier()
-        {
-            kategoriNavn = "Øl"
-        },
-        new Kategorier()
-        {
-            kategoriNavn = "Spiritus"
-        },
-        new Kategorier()
-        {
-            kategoriNavn = "Cider"
-        },
-        new Kategorier()
-        {
-            kategoriNavn = "Sodavand"
-        },
-        new Kategorier()
-        {
-            kategoriNavn = "Energidrik"
-        },
-        new Kategorier()
-        {
-            kategoriNavn = "Juice"
-        },
-        new Kategorier()
-        {
-            kategoriNavn = "Konfekture"
-        }
+        new Kategorier() { kategoriNavn = "Øl" },
+        new Kategorier() { kategoriNavn = "Spiritus" },
+        new Kategorier() { kategoriNavn = "Cider" },
+        new Kategorier() { kategoriNavn = "Sodavand" },
+        new Kategorier() { kategoriNavn = "Energidrik" },
+        new Kategorier() { kategoriNavn = "Juice" },
+        new Kategorier() { kategoriNavn = "Konfekture" }
     };
 
     public static List<Varer> Varer = new()
@@ -89,50 +53,38 @@ public static class DataStore
         new Varer()
         {
             Varerid = 1,
-            Navn = "Carlsberg", 
-            Enhed = "Kasse", 
-            Beskrivelse = "Kasse med 30 Carlsberg Flaskeøl", 
-            Billede = "no data", 
-            Kategorier = new Kategorier()
-            {
-                kategoriNavn = "Øl"
-            }
+            Navn = "Carlsberg",
+            Enhed = "Kasse",
+            Beskrivelse = "Kasse med 30 Carlsberg Flaskeøl",
+            Billede = "no data",
+            Kategorier = new Kategorier() { kategoriNavn = "Øl" }
         },
         new Varer()
         {
-        Varerid = 2, 
-        Navn = "Smirnoff Vodka", 
-        Enhed = "Flaske, 1 L", 
-        Beskrivelse = "Flaske Smirnoff vodka", 
-        Billede = "no data", 
-        Kategorier = new Kategorier()
-        {
-            kategoriNavn = "Spiritus"
-        }
+            Varerid = 2,
+            Navn = "Smirnoff Vodka",
+            Enhed = "Flaske, 1 L",
+            Beskrivelse = "Flaske Smirnoff vodka",
+            Billede = "no data",
+            Kategorier = new Kategorier() { kategoriNavn = "Spiritus" }
         },
         new Varer()
         {
-            Varerid = 3, 
-            Navn = "Redbull", 
-            Enhed = "Kasse", 
-            Beskrivelse = "Kasse med 24 Redbull dåseøl", 
-            Billede = "no data", 
-            Kategorier = new Kategorier()
-            {
-                kategoriNavn = "Energidrik"
-            }
+            Varerid = 3,
+            Navn = "Redbull",
+            Enhed = "Kasse",
+            Beskrivelse = "Kasse med 24 Redbull dåseøl",
+            Billede = "no data",
+            Kategorier = new Kategorier() { kategoriNavn = "Energidrik" }
         },
         new Varer()
         {
-            Varerid = 4, 
-            Navn = "Appelsinjuice", 
-            Enhed = "Karton, 1 L", 
-            Beskrivelse = "Karton appelsinjuice fra Rynkeby,", 
-            Billede = "no data", 
-            Kategorier = new Kategorier()
-            {
-                kategoriNavn = "Juice"
-            }
+            Varerid = 4,
+            Navn = "Appelsinjuice",
+            Enhed = "Karton, 1 L",
+            Beskrivelse = "Karton appelsinjuice fra Rynkeby,",
+            Billede = "no data",
+            Kategorier = new Kategorier() { kategoriNavn = "Juice" }
         }
     };
 
@@ -140,60 +92,38 @@ public static class DataStore
     {
         new VarerBeholdning()
         {
-                VarerbeholdId = 1,
-                VarerId = 1,                       // reference
-                VarerNavn = "Carlsberg",           // denormaliseret kopi
-                Mængde = 24,
-                Udløbsdato = new DateOnly(2025, 12, 24),
-                Lokalitet = new Lokalitet          // embedded
-                {
-                    LokationId = 4,
-                    LokationNavn = "Bag lager"
-                }
-            },
-            // Smirnoff Vodka i Side lager
-            new VarerBeholdning
-            {
-                VarerbeholdId = 2,
-                VarerId = 2,
-                VarerNavn = "Smirnoff Vodka",
-                Mængde = 10,
-                Lokalitet = new Lokalitet
-                {
-                    LokationId = 3,
-                    LokationNavn = "Køkken lager"
-                }
-            },
-            // Redbull i Sodavands lager
-            new VarerBeholdning
-            {
-                VarerbeholdId = 3,
-                VarerId = 3,
-                VarerNavn = "Redbull",
-                Mængde = 24,
-                Udløbsdato = new DateOnly(2025, 12, 14),
-                Lokalitet = new Lokalitet
-                {
-                    LokationId = 2,
-                    LokationNavn = "Sodavands lager"
-                }
-            },
-            // Appelsinjuice i Bar lager
-            new VarerBeholdning
-            {
-                VarerbeholdId = 4,
-                VarerId = 4,
-                VarerNavn = "Appelsinjuice",
-                Mængde = 10,
-                Udløbsdato = new DateOnly(2025, 12, 10),
-                Lokalitet = new Lokalitet
-                {
-                    LokationId = 1,
-                    LokationNavn = "Bar lager"
-                }
-            }
+            VarerbeholdId = 1,
+            VarerId = 1,
+            VarerNavn = "Carlsberg",
+            Mængde = 24,
+            Udløbsdato = new DateOnly(2025, 12, 24),
+            Lokalitet = new Lokalitet { LokationId = 4, LokationNavn = "Bag lager" }
+        },
+        new VarerBeholdning
+        {
+            VarerbeholdId = 2,
+            VarerId = 2,
+            VarerNavn = "Smirnoff Vodka",
+            Mængde = 10,
+            Lokalitet = new Lokalitet { LokationId = 3, LokationNavn = "Køkken lager" }
+        },
+        new VarerBeholdning
+        {
+            VarerbeholdId = 3,
+            VarerId = 3,
+            VarerNavn = "Redbull",
+            Mængde = 24,
+            Udløbsdato = new DateOnly(2025, 12, 14),
+            Lokalitet = new Lokalitet { LokationId = 2, LokationNavn = "Sodavands lager" }
+        },
+        new VarerBeholdning
+        {
+            VarerbeholdId = 4,
+            VarerId = 4,
+            VarerNavn = "Appelsinjuice",
+            Mængde = 10,
+            Udløbsdato = new DateOnly(2025, 12, 10),
+            Lokalitet = new Lokalitet { LokationId = 1, LokationNavn = "Bar lager" }
+        }
     };
-
 }
-
-
