@@ -1,6 +1,5 @@
 @using BasementClient.Pages
 @using Core.Models
-@inject AuthService Auth
 
 @if (Show && SelectedVare != null)
 {
@@ -20,8 +19,7 @@
                     <div class="mb-3">
                         <strong>Billede:</strong>
                         <p>@SelectedVare.Billede</p>
-                    </div>
-
+                    </div> 
                     <div class="mb-3">
                         <strong>Beskrivelse:</strong>
                         <p>@SelectedVare.Beskrivelse</p>
@@ -44,52 +42,36 @@
 
                     <div class="mb-3">
                         <strong>Lokaliteter og Mængder:</strong>
-
                         @if (SelectedBeholdninger != null && SelectedBeholdninger.Any())
                         {
                             <table class="table table-sm">
                                 <thead>
-                                    <tr>
-                                        <th>Lokalitet</th>
-                                        <th>Mængde</th>
-                                        <th>Udløbsdato</th>
-                                        <th>Status</th>
-
-                                        @if (isAdmin)
-                                        {
-                                            <th>Handling</th>
-                                        }
-                                    </tr>
+                                <tr>
+                                    <th>Lokalitet</th>
+                                    <th>Mængde</th>
+                                    <th>Udløbsdato</th>
+                                    <th>Status</th>
+                                    <th>Handling</th>
+                                </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var beholdning in SelectedBeholdninger)
-                                    {
-                                        var status = UdløbsStatusHelper.GetStatus(beholdning.Udløbsdato);
-                                        var melding = UdløbsStatusHelper.GetMelding(beholdning.Udløbsdato);
-
-                                        <tr>
-                                            <td>@beholdning.Lokalitet?.LokationNavn</td>
-                                            <td>@beholdning.Mængde</td>
-                                            <td>@beholdning.Udløbsdato.ToString("dd-MM-yyyy")</td>
-                                            <td>
-                                                @if (!string.IsNullOrEmpty(melding))
-                                                {
-                                                    <span class="status-badge status-@status">@melding</span>
-                                                }
-                                                else
-                                                {
-                                                    <span style="color: green;">✓ OK</span>
-                                                }
-                                            </td>
-
-                                            @if (isAdmin)
+                                @foreach (var beholdning in SelectedBeholdninger)
+                                {
+                                    var status = UdløbsStatusHelper.GetStatus(beholdning.Udløbsdato);
+                                    var melding = UdløbsStatusHelper.GetMelding(beholdning.Udløbsdato);
+            
+                                    <tr>
+                                        <td>@(beholdning.Lokalitet?.LokationNavn ?? "Ingen lokation")</td>
+                                        <td>@beholdning.Mængde</td>
+                                        <td>@beholdning.Udløbsdato.ToString("dd-MM-yyyy")</td>
+                                        <td>
+                                            @if (! string.IsNullOrEmpty(melding))
                                             {
-                                                <td>
-                                                    <button class="btn btn-sm btn-primary" 
-                                                            @onclick="() => OnEdit.InvokeAsync(beholdning)">
-                                                        Rediger
-                                                    </button>
-                                                </td>
+                                                <span class="status-badge status-@status">@melding</span>
+                                            }
+                                            else
+                                            {
+                                                <span style="color: green;">✓ OK</span>
                                             }
                                         </td>
                                         <td>
@@ -109,7 +91,6 @@
                                 }
                                 </tbody>
                             </table>
-
                             <p><strong>Total: @SelectedBeholdninger.Sum(b => b.Mængde)</strong></p>
                         }
                         else
@@ -117,31 +98,33 @@
                             <p>Ingen beholdninger fundet</p>
                         }
                     </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="OnClose">Luk</button>
+                           
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="OnClose">Luk</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        
 }
 
 @code {
-    private bool isAdmin;
+    [Parameter]
+    public bool Show { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        isAdmin = await Auth.IsAdmin();
-    }
+    [Parameter]
+    public Varer? SelectedVare { get; set; }
 
-    [Parameter] public bool Show { get; set; }
+    [Parameter]
+    public List<VarerBeholdning>? SelectedBeholdninger { get; set; }
 
-    [Parameter] public Varer? SelectedVare { get; set; }
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+    
+    [Parameter] public EventCallback<int> OnDelete { get; set; }
 
-    [Parameter] public List<VarerBeholdning>? SelectedBeholdninger { get; set; }
 
-    [Parameter] public EventCallback OnClose { get; set; }
-
-    [Parameter] public EventCallback<VarerBeholdning> OnEdit { get; set; }
+    [Parameter]
+    public EventCallback<VarerBeholdning> OnEdit { get; set; }
 }
