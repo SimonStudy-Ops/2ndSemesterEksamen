@@ -89,5 +89,5 @@
 .nav-logo {
     height: 30px;          /* perfekt til topbar */
     margin-left: 5px;
-    filter: brightness(0) invert(1); /* gør logoet hvidt hvis sidebar er mørk */
+    /*filter: brightness(0) invert(1); /* gør logoet hvidt hvis sidebar er mørk */
 }
