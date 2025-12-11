@@ -41,7 +41,6 @@ else
                 <th>Status</th>
                 <th>Beholdningsstatus</th>
                 <th>Handling</th>
-                <th>Handling</th>
             </tr>
         </thead>
         <tbody>
@@ -84,10 +83,10 @@ else
                     <button class="btn btn-info btn-sm" @onclick="() => OpenDetailsDialog(gruppe.VarerId)">
                         Se Detaljer
                     </button>
+                    <button class="btn btn-warning btn-sm ms-2" @onclick="() => OpenEditVareDialog(gruppe.VarerId)">
+                        Rediger Vare
+                    </button>
                 </td>
-                <button class="btn btn-info btn-sm" @onclick="() => OpenEditVareDialog(gruppe.VarerId)">
-                    Rediger Vare
-                </button>
                 
             </tr>
         }
