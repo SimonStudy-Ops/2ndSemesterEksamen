@@ -45,5 +45,10 @@ namespace WebApplication1.Repositories
         {
             return collection.Find(_ => true).ToList();
         }
+        public void UpdateVarer(Varer vare)
+        {
+            var filter = Builders<Varer>.Filter.Eq(v => v.Varerid, vare.Varerid);
+            collection.ReplaceOne(filter, vare);
+        }
     }
 }

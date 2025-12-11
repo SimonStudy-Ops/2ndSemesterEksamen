@@ -1,0 +1,29 @@
+@code {
+    public static string GetStatus(int aktuelBeholdning, int minimumsBeholdning)
+    {
+        if (aktuelBeholdning <= 0)
+        {
+            return "tom-beholdning";
+        }
+        else if (aktuelBeholdning <= minimumsBeholdning)
+        {
+            return "lav-beholdning";
+        }
+        
+        return "ok";
+    }
+
+    public static string GetMelding(int aktuelBeholdning, int minimumsBeholdning)
+    {
+        if (aktuelBeholdning <= 0)
+        {
+            return "TOM BEHOLDNING";
+        }
+        else if (aktuelBeholdning <= minimumsBeholdning)
+        {
+            return $"LAV BEHOLDNING ({aktuelBeholdning}/{minimumsBeholdning})";
+        }
+        
+        return "";
+    }
+}

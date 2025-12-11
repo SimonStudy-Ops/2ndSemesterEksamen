@@ -38,6 +38,17 @@ namespace WebApplication1.Controllers
         {
             _repo.DeleteById(id);
         }
+        [HttpPut("{id:int}")]
+        public IActionResult Update(int id, [FromBody] Varer vare)
+        {
+            if (id != vare.Varerid)
+            {
+                return BadRequest("Id i URL og objekt stemmer ikke overens.");
+            }
+
+            _repo.UpdateVarer(vare);
+            return NoContent();
+        }
     }
 }
 
