@@ -27,7 +27,7 @@
                 <div class="user-item">
                     <div class="user-actions">
                         <button class="btn-edit" @onclick="() => EditUser(u)">Redigér</button>
-                        <button class="btn-delete" @onclick="() => DeleteUser(u.Brugerid)">Slet</button>
+                        <button class="btn-delete" @onclick="() => AskDelete(u.Brugerid)">Slet</button>
                     </div>
                     <div class="user-name">@u.Navn</div>
                     <div class="muted">
@@ -111,9 +111,23 @@
 
     <div class="modal-footer">
         <button class="btn-edit-save" @onclick="UpdateUser" disabled="@editSaving">Opdatér</button>
-        <button class="btn-secondary" @onclick="CloseEdit">Annullér</button>
+        <button class="btn-secondary" @onclick="CloseEdit">Annuller</button>
     </div>
 </ModalDialog>
+
+@if (vilSletPopup)
+{
+    <div class="simple-modal-overlay">
+        <div class="simple-modal">
+            <div class="simple-modal-title">Bekræft sletning</div>
+            <div class="simple-modal-body">Er du sikker på at du vil slette brugeren?</div>
+            <div class="simple-modal-footer">
+                <button class="btn-delete" @onclick="ConfirmDelete">Slet</button>
+                <button class="btn-secondary is-blue" @onclick="CancelDelete">Annuller</button>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
     private List<Bruger> brugere = new();
@@ -310,6 +324,31 @@
         {
             editSaving = false;
         }
+    }
+
+    private bool vilSletPopup = false;
+    private int sletBrugerId = 0;
+
+    private void AskDelete(int brugerId)
+    {
+        sletBrugerId = brugerId;
+        vilSletPopup = true;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        vilSletPopup = false;
+        if (sletBrugerId > 0)
+        {
+            await DeleteUser(sletBrugerId);
+            sletBrugerId = 0;
+        }
+    }
+
+    private void CancelDelete()
+    {
+        vilSletPopup = false;
+        sletBrugerId = 0;
     }
     
     // JSON converter til DateOnly
