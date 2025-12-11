@@ -17,7 +17,7 @@
     {
         if (aktuelBeholdning <= 0)
         {
-            return "TOM BEHOLDNING";
+            return $"TOM BEHOLDNING ({aktuelBeholdning}/{minimumsBeholdning})";
         }
         else if (aktuelBeholdning <= minimumsBeholdning)
         {
