@@ -116,3 +116,38 @@
 }
 .btn-secondary:hover { background-color: #d32f2f; }
 .btn-secondary:active { background-color: #b71c1c; }
+
+.btn-secondary.is-blue { background-color: #2e6ae6; }
+.btn-secondary.is-blue:hover { background-color: #1f55c4; }
+
+.simple-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.simple-modal {
+    background: #fff;
+    border-radius: 6px;
+    padding: 16px;
+    width: 320px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.simple-modal-title {
+    font-weight: 600;
+    font-size: 18px;
+}
+.simple-modal-body {
+    color: #333;
+}
+.simple-modal-footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
