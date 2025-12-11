@@ -4,6 +4,7 @@
 @using System.Net.Http.Json
 @using System.Linq   
 @using Core.Models
+@using BasementClient.Components
 
 
 <PageTitle>Varelager</PageTitle>
@@ -38,6 +39,8 @@ else
                 <th>Mængde</th>
                 <th>Lokation</th>
                 <th>Status</th>
+                <th>Beholdningsstatus</th>
+                <th>Handling</th>
                 <th>Handling</th>
             </tr>
         </thead>
@@ -47,6 +50,7 @@ else
             var status = UdløbsStatusHelper.GetStatus(gruppe.Udløbsdato);
             var melding = UdløbsStatusHelper.GetMelding(gruppe.Udløbsdato);
             var rowClass = status != "ok" ? $"status-{status}" : "";
+            
         
             <tr class="@rowClass">
                 <td>@gruppe.VarerNavn</td>
@@ -63,10 +67,28 @@ else
                     }
                 </td>
                 <td>
+                    @{
+                        var bStatus = BeholdningsStatusHelper.GetStatus(gruppe.TotalMængde, gruppe.MinimumsBeholdning);
+                        var bMelding = BeholdningsStatusHelper.GetMelding(gruppe.TotalMængde, gruppe.MinimumsBeholdning);
+                    }
+                    @if (! string.IsNullOrEmpty(bMelding))
+                    {
+                        <span class="status-badge status-@bStatus">@bMelding</span>
+                    }
+                    else
+                    {
+                        <span style="color:  green;">✓ OK</span>
+                    }
+                </td>
+                <td>
                     <button class="btn btn-info btn-sm" @onclick="() => OpenDetailsDialog(gruppe.VarerId)">
                         Se Detaljer
                     </button>
                 </td>
+                <button class="btn btn-info btn-sm" @onclick="() => OpenEditVareDialog(gruppe.VarerId)">
+                    Rediger Vare
+                </button>
+                
             </tr>
         }
         </tbody>
@@ -188,6 +210,10 @@ else
                         <!-- Simpel tekst input for at holde det nemt, kan også være dropdown -->
                         <input type="text" class="form-control" @bind="newVare.Kategorier.kategoriNavn" placeholder="Indtast kategori navn" />
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Minimumsbeholdning</label>
+                        <input type="number" class="form-control" @bind="newVare.MinimumsBeholdning" min="0" />
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @onclick="CloseCreateVareDialog">Annuller</button>
@@ -265,8 +291,53 @@ else
         </div>
     </div>
 }
+@if (showEditVareDialog)
+{
+    <div class="modal" style="display: block; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rediger Vare</h5>
+                    <button type="button" class="btn-close" @onclick="CloseEditVareDialog"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Vare ID</label>
+                        <input type="number" class="form-control" @bind="editVare.Varerid" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Navn</label>
+                        <input type="text" class="form-control" @bind="editVare.Navn" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Beskrivelse</label>
+                        <input type="text" class="form-control" @bind="editVare.Beskrivelse" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Enhed</label>
+                        <input type="text" class="form-control" @bind="editVare.Enhed" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Minimumsbeholdning</label>
+                        <input type="number" class="form-control" @bind="editVare.MinimumsBeholdning" min="0" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kategori</label>
+                        <input type="text" class="form-control" @bind="editVare.Kategorier.kategoriNavn" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseEditVareDialog">Annuller</button>
+                    <button type="button" class="btn btn-primary" @onclick="SaveEditedVare">Gem</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
+    private bool showEditVareDialog = false;
+    private Varer editVare = new Varer();
     private bool showDetailsDialog = false;
     private Varer?  selectedVare = null;
     private VarerBeholdning? selectedVareBeholdning = null;
@@ -345,7 +416,8 @@ else
                     TotalMængde = gruppe.Sum(v => v.Mængde),
                     Beholdninger = gruppe.ToList(),
                     // Find den TIDLIGSTE udløbsdato blandt alle beholdninger
-                    Udløbsdato = gruppe.Min(b => b.Udløbsdato)
+                    Udløbsdato = gruppe.Min(b => b.Udløbsdato),
+                    MinimumsBeholdning = allVarer?.FirstOrDefault(v => v.Varerid == gruppe.Key)?.MinimumsBeholdning ?? 0
                 })
                 .OrderBy(g => g.VarerNavn);
         }
@@ -606,7 +678,42 @@ else
             Console.WriteLine($"Fejl ved sletning af VarerBeholdning {varerbeholdId}: {response.StatusCode}");
         }
     }
+    
+    private void OpenEditVareDialog(int varerId)
+    {
+        var vare = allVarer?.FirstOrDefault(v => v.Varerid == varerId);
+        if (vare != null)
+        {
+            editVare = new Varer
+            {
+                Varerid = vare.Varerid,
+                Navn = vare.Navn,
+                Beskrivelse = vare.Beskrivelse,
+                Enhed = vare.Enhed,
+                MinimumsBeholdning = vare.MinimumsBeholdning,
+                Billede = vare.Billede,
+                Udløbsdato = vare.Udløbsdato,
+                Kategorier = new Kategorier 
+                { 
+                    kategoriNavn = vare.Kategorier?.kategoriNavn ?? "" 
+                }
+            };
+            showEditVareDialog = true;
+        }
+    }
 
+    private void CloseEditVareDialog() 
+    {
+        showEditVareDialog = false;
+    }
+
+    private async Task SaveEditedVare()  
+    {
+        await Http.PutAsJsonAsync($"api/varer/{editVare.Varerid}", editVare);
+        await LoadAllVarer();
+        BuildKategoriData();
+        CloseEditVareDialog();
+    }
     
     public class GrupperetVare
     {
@@ -615,5 +722,6 @@ else
         public int TotalMængde { get; set; }
         public List<VarerBeholdning> Beholdninger { get; set; } = new();
         public DateOnly Udløbsdato { get; set; }
+        public int MinimumsBeholdning { get; set; }
     }
 }

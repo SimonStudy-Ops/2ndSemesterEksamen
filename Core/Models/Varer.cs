@@ -15,4 +15,5 @@ public class Varer
     public string Beskrivelse { get; set; }
     public string Billede { get; set; }
     public Kategorier Kategorier { get; set; } // Embedded
+    public int MinimumsBeholdning { get; set; } = 0;
 }
