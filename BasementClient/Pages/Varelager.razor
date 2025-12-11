@@ -211,8 +211,13 @@ else
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Kategori</label>
-                        <!-- Simpel tekst input for at holde det nemt, kan også være dropdown -->
-                        <input type="text" class="form-control" @bind="newVare.Kategorier.kategoriNavn" placeholder="Indtast kategori navn" />
+                        <select class="form-control" @bind="newVare.Kategorier.kategoriNavn">
+                            <option value="">-- Vælg kategori --</option>
+                            @foreach (var kat in kategoriOptions)
+                            {
+                                <option value="@kat">@kat</option>
+                            }
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Minimumsbeholdning</label>
@@ -328,7 +333,13 @@ else
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Kategori</label>
-                        <input type="text" class="form-control" @bind="editVare.Kategorier.kategoriNavn" />
+                        <select class="form-control" @bind="editVare.Kategorier.kategoriNavn">
+                            <option value="">-- Vælg kategori --</option>
+                            @foreach (var kat in kategoriOptions)
+                            {
+                                <option value="@kat">@kat</option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -546,14 +557,14 @@ else
             {
                 newVarerBeholdning.VarerId = selectedVareLocal.Varerid;
                 newVarerBeholdning.VarerNavn = selectedVareLocal.Navn;
-                selectedUdløbsdato = selectedVareLocal.Udløbsdato;
+                
             }
         }
         else
         {
             newVarerBeholdning.VarerId = 0;
             newVarerBeholdning.VarerNavn = "";
-            selectedUdløbsdato = DateOnly.FromDateTime(DateTime.Now);
+            
         }
     }
 
@@ -697,7 +708,6 @@ else
                 Enhed = vare.Enhed,
                 MinimumsBeholdning = vare.MinimumsBeholdning,
                 Billede = vare.Billede,
-                Udløbsdato = vare.Udløbsdato,
                 Kategorier = new Kategorier 
                 { 
                     kategoriNavn = vare.Kategorier?.kategoriNavn ?? "" 
