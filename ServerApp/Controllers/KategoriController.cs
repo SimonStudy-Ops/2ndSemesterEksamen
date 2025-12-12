@@ -32,12 +32,5 @@ namespace WebApplication1.Controllers
             _repo.CreateKategori(kategori);
             return Ok();
         }
-
-        [HttpDelete("{navn}")]
-        public IActionResult Delete(string navn)
-        {
-            _repo.DeleteByName(navn);
-            return NoContent();
-        }
     }
 }

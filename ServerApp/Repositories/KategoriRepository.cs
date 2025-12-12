@@ -27,11 +27,5 @@ namespace WebApplication1.Repositories
         {
             return collection.Find(_ => true).ToList();
         }
-
-        public void DeleteByName(string kategoriNavn)
-        {
-            var filter = Builders<Kategorier>.Filter.Eq(k => k.kategoriNavn, kategoriNavn);
-            collection.DeleteOne(filter);
-        }
     }
 }
