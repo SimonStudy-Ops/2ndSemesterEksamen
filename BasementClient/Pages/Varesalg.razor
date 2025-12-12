@@ -44,7 +44,7 @@ else
                             @foreach (var b in gruppe.Beholdninger)
                             {
                                 var locName = b.Lokalitet?.LokationNavn ?? "Ukendt";
-                                <option value="@b.VarerbeholdId">@locName (mængde: @b.Mængde) — ID: @b.VarerbeholdId</option>
+                                <option value="@b.VarerbeholdId">@locName (mængde: @b.Mængde) - ID: @b.VarerbeholdId</option>
                             }
                         </select>
                     
