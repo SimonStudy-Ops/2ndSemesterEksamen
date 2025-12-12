@@ -1,0 +1,254 @@
+@page "/Varesalg"
+@inject HttpClient Http
+@inject AuthService Auth
+@using System.Net.Http.Json
+@using System.Linq   
+@using Core.Models
+
+<h3>Varesalg</h3>
+
+@if (varerBeholdning == null)
+{
+    <p><em>Indlæser...</em></p>
+}
+else
+{
+    <table class="table-striped simple-sale-table">
+        <thead>
+        <tr>
+            <th>Vare navn</th>
+            <th>Mængde</th>
+            <th>Justér</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var gruppe in GrupperedeVarer)
+        {
+            <tr class="hover-row">
+                <td>@gruppe.VarerNavn</td>
+                <td class="qty-cell">@gruppe.TotalMængde</td>
+                <td class="actions-cell">
+                    <button class="btn btn-sm btn-outline-secondary sale-btn plus"
+                            disabled="@(HasSelectedBeholdning(gruppe) ? false : true)"
+                            @onclick="() => IncreaseQuantity(gruppe)">+</button>
+
+                    <button class="btn btn-sm btn-outline-secondary sale-btn minus me-2"
+                            disabled="@(HasSelectedBeholdning(gruppe) ? false : true)"
+                            @onclick="() => DecreaseQuantity(gruppe)">-</button>
+                    
+                    <div class="move-controls mt-2">
+                        <!-- Beholdning dropdown (viser lokation + mængde) -->
+                        <select class="form-select form-select-sm move-select"
+                                @onchange="(e) => OnSelectedBeholdningChanged(gruppe.VarerId, e)">
+                            <option value="">Vælg beholdning</option>
+                            @foreach (var b in gruppe.Beholdninger)
+                            {
+                                var locName = b.Lokalitet?.LokationNavn ?? "Ukendt";
+                                <option value="@b.VarerbeholdId">@locName (mængde: @b.Mængde) - ID: @b.VarerbeholdId</option>
+                            }
+                        </select>
+                    
+                        <!-- Ny lokation dropdown -->
+                        <select class="form-select form-select-sm move-select ms-2"
+                                @onchange="(e) => OnMoveLokationChanged(gruppe.VarerId, e)">
+                            <option value="">Vælg ny lokation</option>
+                            <option value="1">Bar lager</option>
+                            <option value="2">Sodavands lager</option>
+                            <option value="3">Køkken lager</option>
+                            <option value="4">Bag lager</option>
+                        </select>
+
+                        <button class="btn btn-sm btn-outline-primary ms-2"
+                                @onclick="() => MoveSelectedBeholdning(gruppe.VarerId)">
+                            Flyt
+                        </button>
+                    </div>
+                    
+                    @if (!HasSelectedBeholdning(gruppe))
+                    {
+                        <div class="text-muted small mt-1">Vælg en beholdning for at justere.</div>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+@functions {
+    private bool HasSelectedBeholdning(GrupperetVare gruppe)
+    {
+        return valgtBeholdningPrVareId.TryGetValue(gruppe.VarerId, out var beholdId) && beholdId > 0;
+    }
+}
+
+
+@code {
+    private List<VarerBeholdning>? varerBeholdning;
+    private List<Varer>? allVarer;
+    
+    // Vælge varerbeholdning pr. varer gruppe og ny lokation
+    private Dictionary<int, int> valgtBeholdningPrVareId = new();
+    private Dictionary<int, int> valgtLokationPrVareId = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadVarerBeholdning();
+        await LoadAllVarer();
+    }
+
+    private async Task LoadVarerBeholdning()
+    {
+        varerBeholdning = await Http.GetFromJsonAsync<List<VarerBeholdning>>("api/VarerBeholdning");
+    }
+
+    private async Task LoadAllVarer()
+    {
+        try
+        {
+            allVarer = await Http.GetFromJsonAsync<List<Varer>>("api/Varer");
+        }
+        catch
+        {
+            allVarer = new List<Varer>();
+        }
+    }
+
+    private IEnumerable<GrupperetVare> GrupperedeVarer
+    {
+        get
+        {
+            if (varerBeholdning == null)
+                return Enumerable.Empty<GrupperetVare>();
+
+            var filtreret = varerBeholdning.ToList();
+            
+            return filtreret
+                .GroupBy(v => v.VarerId)
+                .Select(gruppe => new GrupperetVare
+                {
+                    VarerId = gruppe.Key,
+                    VarerNavn = gruppe.First().VarerNavn,
+                    TotalMængde = gruppe.Sum(v => v.Mængde),
+                    Beholdninger = gruppe.ToList(),
+                    Udløbsdato = gruppe.Min(b => b.Udløbsdato),
+                    MinimumsBeholdning = allVarer?.FirstOrDefault(v => v.Varerid == gruppe.Key)?.MinimumsBeholdning ?? 0
+                })
+                .OrderBy(g => g.VarerNavn);
+        }
+        
+    }
+
+    private async Task IncreaseQuantity(GrupperetVare gruppe)
+    {
+        var target = gruppe.Beholdninger.FirstOrDefault();
+        if (target == null) return;
+
+        var updated = MakeEditableCopy(target);
+        updated.Mængde = Math.Max(0, updated.Mængde + 1);
+
+        await Http.PutAsJsonAsync($"api/VarerBeholdning/{updated.VarerbeholdId}", updated);
+        await LoadVarerBeholdning();
+    }
+    
+    private async Task DecreaseQuantity(GrupperetVare gruppe)
+    {
+        var target = gruppe.Beholdninger.FirstOrDefault();
+        if (target == null) return;
+
+        var updated = MakeEditableCopy(target);
+        // Undgå negative tal
+        updated.Mængde = Math.Max(0, updated.Mængde - 1);
+
+        await Http.PutAsJsonAsync($"api/VarerBeholdning/{updated.VarerbeholdId}", updated);
+        await LoadVarerBeholdning();
+    }
+    
+    private void OnSelectedBeholdningChanged(int varerId, ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int beholdId) && beholdId > 0)
+        {
+            valgtBeholdningPrVareId[varerId] = beholdId;
+        }
+        else
+        {
+            valgtBeholdningPrVareId.Remove(varerId);
+        }
+    }
+
+    private void OnMoveLokationChanged(int varerId, ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int lokId) && lokId > 0)
+        {
+            valgtLokationPrVareId[varerId] = lokId;
+        }
+        else
+        {
+            valgtLokationPrVareId.Remove(varerId);
+        }
+    }
+
+    private async Task MoveSelectedBeholdning(int varerId)
+    {
+        // Tjek om både beholdning og ny lokation er valgt
+        if (!valgtBeholdningPrVareId.TryGetValue(varerId, out int beholdId) || beholdId <= 0)
+            return;
+        if (!valgtLokationPrVareId.TryGetValue(varerId, out int lokId) || lokId <= 0)
+            return;
+
+        // Find den konkrete beholdning i gruppen
+        var gruppe = GrupperedeVarer.FirstOrDefault(g => g.VarerId == varerId);
+        var target = gruppe?.Beholdninger.FirstOrDefault(b => b.VarerbeholdId == beholdId);
+        if (target == null) return;
+
+        string lokationNavn = lokId switch
+        {
+            1 => "Bar lager",
+            2 => "Sodavands lager",
+            3 => "Køkken lager",
+            4 => "Bag lager",
+            _ => ""
+        };
+
+        var updated = MakeEditableCopy(target);
+        updated.Lokalitet = new Lokalitet
+        {
+            LokationId = lokId,
+            LokationNavn = lokationNavn
+        };
+
+        await Http.PutAsJsonAsync($"api/VarerBeholdning/{updated.VarerbeholdId}", updated);
+        await LoadVarerBeholdning();
+    }
+    
+    private VarerBeholdning MakeEditableCopy(VarerBeholdning item)
+    {
+        return new VarerBeholdning
+        {
+            VarerbeholdId = item.VarerbeholdId,
+            VarerId = item.VarerId,
+            VarerNavn = item.VarerNavn,
+            Mængde = item.Mængde,
+            Udløbsdato = item.Udløbsdato,
+            Lokalitet = item.Lokalitet == null
+                ? new Lokalitet()
+                : new Lokalitet
+                {
+                    LokationId = item.Lokalitet.LokationId,
+                    LokationNavn = item.Lokalitet.LokationNavn
+                },
+            KategoriNavn = item.KategoriNavn
+        };
+    }
+
+
+    public class GrupperetVare
+    {
+        public int VarerId { get; set; }
+        public string? VarerNavn { get; set; }
+        public int TotalMængde { get; set; }
+        public List<VarerBeholdning> Beholdninger { get; set; } = new();
+        public DateOnly Udløbsdato { get; set; }
+        public int MinimumsBeholdning { get; set; }
+    }
+
+}
