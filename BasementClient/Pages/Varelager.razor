@@ -211,13 +211,21 @@ else
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Kategori</label>
-                        <select class="form-control" @bind="newVare.Kategorier.kategoriNavn">
-                            <option value="">-- Vælg kategori --</option>
-                            @foreach (var kat in kategoriOptions)
+                        <div class="d-flex gap-2">
+                            <select class="form-control" @bind="newVare.Kategorier.kategoriNavn">
+                                <option value="">-- Vælg kategori --</option>
+                                @foreach (var kat in kategoriOptions)
+                                {
+                                    <option value="@kat">@kat</option>
+                                }
+                            </select>
+                            @if (isAdmin)
                             {
-                                <option value="@kat">@kat</option>
+                                <button type="button" class="btn btn-success" @onclick="OpenNewKategoriDialog" title="Tilføj ny kategori">
+                                    <span>+</span>
+                                </button>
                             }
-                        </select>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Minimumsbeholdning</label>
@@ -236,7 +244,6 @@ else
     Show="@showDetailsDialog" 
     SelectedVare="@selectedVare" 
     SelectedBeholdninger="@selectedBeholdninger"
-    IsAdmin="@isAdmin"
     OnClose="@CloseDetailsDialog"
     OnEdit="@HandleEditFromDetails"
     OnDelete="@HandleDeleteFromDetails"/>
@@ -333,13 +340,7 @@ else
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Kategori</label>
-                        <select class="form-control" @bind="editVare.Kategorier.kategoriNavn">
-                            <option value="">-- Vælg kategori --</option>
-                            @foreach (var kat in kategoriOptions)
-                            {
-                                <option value="@kat">@kat</option>
-                            }
-                        </select>
+                        <input type="text" class="form-control" @bind="editVare.Kategorier.kategoriNavn" />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -350,8 +351,33 @@ else
         </div>
     </div>
 }
+@if (showNewKategoriDialog)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 1060;">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Opret Ny Kategori</h5>
+                    <button type="button" class="btn-close" @onclick="CloseNewKategoriDialog"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Kategorinavn</label>
+                        <input type="text" class="form-control" @bind="newKategoriNavn" placeholder="Fx: Vin, Snacks..." />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseNewKategoriDialog">Annuller</button>
+                    <button type="button" class="btn btn-primary" @onclick="SaveNewKategori">Gem</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
+    private bool showNewKategoriDialog = false;
+    private string newKategoriNavn = "";
     private bool showEditVareDialog = false;
     private Varer editVare = new Varer();
     private bool showDetailsDialog = false;
@@ -557,14 +583,14 @@ else
             {
                 newVarerBeholdning.VarerId = selectedVareLocal.Varerid;
                 newVarerBeholdning.VarerNavn = selectedVareLocal.Navn;
-                
+                selectedUdløbsdato = selectedVareLocal.Udløbsdato;
             }
         }
         else
         {
             newVarerBeholdning.VarerId = 0;
             newVarerBeholdning.VarerNavn = "";
-            
+            selectedUdløbsdato = DateOnly.FromDateTime(DateTime.Now);
         }
     }
 
@@ -708,6 +734,7 @@ else
                 Enhed = vare.Enhed,
                 MinimumsBeholdning = vare.MinimumsBeholdning,
                 Billede = vare.Billede,
+                Udløbsdato = vare.Udløbsdato,
                 Kategorier = new Kategorier 
                 { 
                     kategoriNavn = vare.Kategorier?.kategoriNavn ?? "" 
@@ -728,6 +755,55 @@ else
         await LoadAllVarer();
         BuildKategoriData();
         CloseEditVareDialog();
+    }
+    private void OpenNewKategoriDialog()
+    {
+        newKategoriNavn = "";
+        showNewKategoriDialog = true;
+    }
+
+    private void CloseNewKategoriDialog()
+    {
+        showNewKategoriDialog = false;
+    }
+
+    private async Task SaveNewKategori()
+    {
+        if (string.IsNullOrWhiteSpace(newKategoriNavn))
+        {
+            return; // Tom kategori - gem ikke
+        }
+
+        // Tjek om kategorien allerede findes
+        if (kategoriOptions.Contains(newKategoriNavn.Trim()))
+        {
+            Console.WriteLine("Kategorien findes allerede");
+            CloseNewKategoriDialog();
+            return;
+        }
+
+        try
+        {
+            // Gem kategorien i MongoDB via API
+            var nyKategori = new Kategorier { kategoriNavn = newKategoriNavn.Trim() };
+            var response = await Http.PostAsJsonAsync("api/kategorier", nyKategori);
+        
+            if (response.IsSuccessStatusCode)
+            {
+                // Tilføj til dropdown listen
+                kategoriOptions.Add(newKategoriNavn.Trim());
+                kategoriOptions.Sort();
+            
+                // Sæt den nye kategori som valgt
+                newVare.Kategorier.kategoriNavn = newKategoriNavn.Trim();
+            
+                CloseNewKategoriDialog();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fejl ved oprettelse af kategori: {ex.Message}");
+        }
     }
     
     public class GrupperetVare
