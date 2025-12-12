@@ -18,7 +18,6 @@ builder.Services.AddControllers()
 builder.Services.AddSingleton<VarerRepository>();
 builder.Services.AddSingleton<VarerBeholdningRepository>();
 builder.Services.AddSingleton<BrugerRepository>();
-builder.Services.AddSingleton<KategoriRepository>();
 
 builder.Services.AddCors(options =>
 {
