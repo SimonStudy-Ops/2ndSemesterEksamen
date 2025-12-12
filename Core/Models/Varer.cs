@@ -11,6 +11,7 @@ public class Varer
     
     public string Navn { get; set; }
     public string Enhed { get; set; }
+    public DateOnly Udløbsdato { get; set; }
     public string Beskrivelse { get; set; }
     public string Billede { get; set; }
     public Kategorier Kategorier { get; set; } // Embedded
