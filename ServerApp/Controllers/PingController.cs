@@ -9,6 +9,6 @@ public class PingController : ControllerBase
     [HttpGet]
     public string Get()
     {
-        return "Ping - 8 - dec 2025";
+        return "Ping - 12 - dec 2025";
     }
 }
