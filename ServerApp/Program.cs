@@ -19,6 +19,7 @@ builder.Services.AddSingleton<VarerRepository>();
 builder.Services.AddSingleton<VarerBeholdningRepository>();
 builder.Services.AddSingleton<BrugerRepository>();
 builder.Services.AddSingleton<KategoriRepository>();
+builder.Services.AddSingleton<IFileRepository,AzureStorageFileRepository>();
 
 builder.Services.AddCors(options =>
 {
