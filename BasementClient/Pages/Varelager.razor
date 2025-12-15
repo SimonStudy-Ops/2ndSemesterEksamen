@@ -11,35 +11,76 @@
 
 <PageTitle>Varelager</PageTitle>
 
-<h3>Varelager</h3>
-@if (isAdmin)
-{
-    <!-- Knapper der kun vises for admins -->
-<button class="btn btn-primary mb-3" @onclick="OpenCreateDialog">Opret Vare i Lager</button>
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h3>Lager Oversigt</h3>
+        @if (isAdmin)
+        {
+            <div class="header-actions">
+                <button class="btn btn-primary" @onclick="OpenCreateDialog">
+                    <span>➕</span> Opret Vare i Lager
+                </button>
+                <button class="btn btn-success ms-2" @onclick="OpenCreateVareDialog">
+                    <span>✨</span> Opret Ny Vare
+                </button>
+            </div>
+        }
+    </div>
+<div class="filters-section">
+    <KategoriDropdown KategoriOptions="kategoriOptions"
+                      SelectedKategori="@selectedKategori"
+                      SelectedKategoriChanged="OnSelectedKategoriChanged" />
 
+    <VarerlagerSearch SearchText="@searchText"
+                      SearchTextChanged="OnSearchTextChanged" />
+</div>
+    <div class="dashboard-grid">
+        <!-- Venstre side: Varelager tabel -->
+        <div class="card main-table-card">
+            <div class="card-header">
+                <h4>Varelager</h4>
+                <a href="#" class="view-all">Se Alle</a>
+            </div>
+            
+            @if (varerBeholdning == null)
+            {
+                <div class="loading"><em>Indlæser...</em></div>
+            }
+            else
+            {
+                <VarerlagerTable GrupperedeVarer="@GrupperedeVarer"
+                                 IsAdmin="@isAdmin"
+                                 OnDetailsClick="@OpenDetailsDialog"
+                                 OnEditVareClick="@OpenEditVareDialog" />
+            }
+        </div>
 
-
-    <button class="btn btn-success mb-3 ms-2" @onclick="OpenCreateVareDialog">Opret Ny Vare (Admin)</button>
-}
-<KategoriDropdown KategoriOptions="kategoriOptions"
-                  SelectedKategori="@selectedKategori"
-                  SelectedKategoriChanged="OnSelectedKategoriChanged" />
-
-<VarerlagerSearch SearchText="@searchText"
-                 SearchTextChanged="OnSearchTextChanged" />
-
-@if (varerBeholdning == null)
-{
-    <p><em>Indlæser...</em></p>
-}
-else
-{
-    <VarerlagerTable GrupperedeVarer="@GrupperedeVarer"
-                     IsAdmin="@isAdmin"
-                     OnDetailsClick="@OpenDetailsDialog"
-                     OnEditVareClick="@OpenEditVareDialog" />
-}
-
+        <!-- Højre side: Top produkter -->
+        <div class="card top-products-card">
+            <div class="card-header">
+                <h4>Mest Anvendte Varer</h4>
+                <a href="#" class="view-all">Se Alle</a>
+            </div>
+            
+            <div class="products-list">
+                @if (varerBeholdning != null)
+                {
+                    @foreach (var top in GrupperedeVarer. OrderByDescending(v => v.TotalMængde).Take(5))
+                    {
+                        <div class="product-item">
+                            <div class="product-icon">📦</div>
+                            <div class="product-info">
+                                <div class="product-name">@top.VarerNavn</div>
+                                <div class="product-units">@top.TotalMængde stk</div>
+                            </div>
+                            <div class="product-amount">@top.TotalMængde</div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
 <OpretVareBeholdningModal Show="@showCreateDialog"
                            NewVarerBeholdning="@newVarerBeholdning"
                            AllVarer="@allVarer"
