@@ -21,7 +21,7 @@ public class FileController : ControllerBase
             return BadRequest("No file uploaded.");
 
         var blobName = await mFileRep.AddAsync(file);
-        return Ok(new { url = blobName });
+        return Ok(blobName);
     }
     
     [HttpGet("download/{filename}")]
@@ -34,7 +34,11 @@ public class FileController : ControllerBase
 
         var (stream, contentType) = result.Value;
 
-        return File(stream, contentType);
+        return File(
+            fileStream: stream, 
+            contentType: contentType, 
+            fileDownloadName: null // VIGTIGT: Sætter Content-Disposition til INLINE
+        );
     }
 
     [HttpGet]
