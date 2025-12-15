@@ -19,7 +19,7 @@
                     <div class="mb-3">
                         <label class="form-label">Upload Billede</label>
                         <InputFile OnChange="OnFileSelected" accept="image/*" class="form-control" />
-                        @if (! string.IsNullOrEmpty(uploadStatus))
+                        @if (!string.IsNullOrEmpty(uploadStatus))
                         {
                             <small class="text-info">@uploadStatus</small>
                         }
@@ -86,12 +86,18 @@
     [Parameter]
     public EventCallback OnNewKategoriClick { get; set; }
     
-    private IBrowserFile? selectedFile;
+    [Parameter]
+    public IBrowserFile? SelectedFile { get; set; }
+    
+    [Parameter]
+    public EventCallback<IBrowserFile? > SelectedFileChanged { get; set; }
+    
     private string uploadStatus = "";
 
     private async Task OnFileSelected(InputFileChangeEventArgs e)
     {
-        selectedFile = e.File;
-        uploadStatus = $"Valgt: {selectedFile.Name}";
+        SelectedFile = e.File;
+        uploadStatus = $"Valgt: {SelectedFile.Name}";
+        await SelectedFileChanged.InvokeAsync(SelectedFile);
     }
 }

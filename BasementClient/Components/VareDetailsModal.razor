@@ -1,6 +1,7 @@
 @using BasementClient.Pages
+@using BasementClient.Services
 @using Core.Models
-
+@inject IFileService FileService
 @if (Show && SelectedVare != null)
 {
     <div class="modal" style="display:block; background-color: rgba(0,0,0,0.5);">
@@ -18,7 +19,16 @@
                     
                     <div class="mb-3">
                         <strong>Billede:</strong>
-                        <p>@SelectedVare.Billede</p>
+                        @if (SelectedVare.Billede != "no data" && ! string.IsNullOrEmpty(SelectedVare.Billede))
+                        {
+                            <img src="@FileService.ConvertToUrl(SelectedVare.Billede)" 
+                                 alt="@SelectedVare.Navn" 
+                                 style="max-width: 300px; max-height: 300px;" />
+                        }
+                        else
+                        {
+                            <p>Intet billede uploaded</p>
+                        }
                     </div> 
                     <div class="mb-3">
                         <strong>Beskrivelse:</strong>
