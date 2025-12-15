@@ -11,7 +11,7 @@ public class AzureStorageFileRepository : IFileRepository
         var connStr = config["AzureStorage:ConnectionString"];
         var containerName = config["AzureStorage:ContainerName"];
         _container = new BlobContainerClient(connStr, containerName);
-        _container.CreateIfNotExists();
+        _container.CreateIfNotExists(PublicAccessType.Blob); // Gør billeder offentligt tilgængelige
     }
 
     public async Task<string> AddAsync(IFormFile file)
