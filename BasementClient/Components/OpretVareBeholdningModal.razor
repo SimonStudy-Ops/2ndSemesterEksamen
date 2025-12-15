@@ -51,10 +51,6 @@
                         <label class="form-label">Mængde</label>
                         <input type="number" class="form-control" @bind="NewVarerBeholdning.Mængde" />
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Udløbsdato</label>
-                        <input type="date" class="form-control" @bind="SelectedUdløbsdato" />
-                    </div>
                     
                     <h6 class="mt-3">Lokalitet</h6>
                     
@@ -77,6 +73,11 @@
                     <div class="mb-3">
                         <label class="form-label">Lokation Navn (tildeles automatisk)</label>
                         <input type="text" class="form-control" @bind="LokationNavn" readonly />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Udløbsdato</label>
+                        <input type="date" class="form-control" @bind="SelectedUdløbsdato" />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -131,8 +132,7 @@
             {
                 NewVarerBeholdning.VarerId = selectedVareLocal.Varerid;
                 NewVarerBeholdning.VarerNavn = selectedVareLocal.Navn;
-                SelectedUdløbsdato = selectedVareLocal.Udløbsdato;
-                await SelectedUdløbsdatoChanged.InvokeAsync(SelectedUdløbsdato);
+                
             }
         }
         else
@@ -140,6 +140,8 @@
             NewVarerBeholdning.VarerId = 0;
             NewVarerBeholdning.VarerNavn = "";
             SelectedUdløbsdato = DateOnly.FromDateTime(DateTime.Now);
+            NewVarerBeholdning.Udløbsdato = SelectedUdløbsdato;
+
             await SelectedUdløbsdatoChanged.InvokeAsync(SelectedUdløbsdato);
         }
     }
