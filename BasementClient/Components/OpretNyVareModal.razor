@@ -1,0 +1,78 @@
+@using Core.Models
+
+@if (Show)
+{
+    <div class="modal" style="display:block; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Opret Helt Ny Vare</h5>
+                    <button type="button" class="btn-close" @onclick="OnClose"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Navn</label>
+                        <input type="text" class="form-control" @bind="NewVare.Navn" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Beskrivelse</label>
+                        <input type="text" class="form-control" @bind="NewVare.Beskrivelse" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Enhed (fx Kasse, Flaske)</label>
+                        <input type="text" class="form-control" @bind="NewVare.Enhed" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kategori</label>
+                        <div class="d-flex gap-2">
+                            <select class="form-control" @bind="NewVare.Kategorier.kategoriNavn">
+                                <option value="">-- Vælg kategori --</option>
+                                @foreach (var kat in KategoriOptions)
+                                {
+                                    <option value="@kat">@kat</option>
+                                }
+                            </select>
+                            @if (IsAdmin)
+                            {
+                                <button type="button" class="btn btn-success" @onclick="OnNewKategoriClick" title="Tilføj ny kategori">
+                                    <span>+</span>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Minimumsbeholdning</label>
+                        <input type="number" class="form-control" @bind="NewVare.MinimumsBeholdning" min="0" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="OnClose">Annuller</button>
+                    <button type="button" class="btn btn-primary" @onclick="OnSave">Opret Vare</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool Show { get; set; }
+
+    [Parameter]
+    public Varer NewVare { get; set; } = new Varer();
+
+    [Parameter]
+    public List<string> KategoriOptions { get; set; } = new();
+
+    [Parameter]
+    public bool IsAdmin { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback OnNewKategoriClick { get; set; }
+}
