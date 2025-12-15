@@ -13,5 +13,7 @@ builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(Server.Url) });
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IFileService>();
+builder.Services.AddScoped<FileService>();
 
 await builder.Build().RunAsync();

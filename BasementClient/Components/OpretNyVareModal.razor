@@ -1,4 +1,6 @@
+@using BasementClient.Services
 @using Core.Models
+@inject IFileService FileService
 
 @if (Show)
 {
@@ -13,6 +15,14 @@
                     <div class="mb-3">
                         <label class="form-label">Navn</label>
                         <input type="text" class="form-control" @bind="NewVare.Navn" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Upload Billede</label>
+                        <InputFile OnChange="OnFileSelected" accept="image/*" class="form-control" />
+                        @if (! string.IsNullOrEmpty(uploadStatus))
+                        {
+                            <small class="text-info">@uploadStatus</small>
+                        }
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Beskrivelse</label>
@@ -75,4 +85,13 @@
 
     [Parameter]
     public EventCallback OnNewKategoriClick { get; set; }
+    
+    private IBrowserFile? selectedFile;
+    private string uploadStatus = "";
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        uploadStatus = $"Valgt: {selectedFile.Name}";
+    }
 }
