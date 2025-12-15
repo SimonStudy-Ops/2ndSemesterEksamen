@@ -18,4 +18,19 @@
       <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\BeholdningsStatusHelper.razor" />
+      <_ContentIncludedByDefault Remove="Components\KategoriDropdown.razor" />
+      <_ContentIncludedByDefault Remove="Components\ModalDialog.razor" />
+      <_ContentIncludedByDefault Remove="Components\NyKategoriModal.razor" />
+      <_ContentIncludedByDefault Remove="Components\OpretNyVareModal.razor" />
+      <_ContentIncludedByDefault Remove="Components\OpretVareBeholdningModal.razor" />
+      <_ContentIncludedByDefault Remove="Components\RedigerVareBeholdningModal.razor" />
+      <_ContentIncludedByDefault Remove="Components\RedigerVareModal.razor" />
+      <_ContentIncludedByDefault Remove="Components\UdløbsStatusHelper.razor" />
+      <_ContentIncludedByDefault Remove="Components\VareDetailsModal.razor" />
+      <_ContentIncludedByDefault Remove="Components\VarerlagerSearch.razor" />
+      <_ContentIncludedByDefault Remove="Components\VarerlagerTable.razor" />
+    </ItemGroup>
+
 </Project>
