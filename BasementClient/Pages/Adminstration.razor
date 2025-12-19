@@ -139,7 +139,6 @@
     
     // Til modaldialog
     private ModalDialog? modalRef;      // reference til komponent
-    private Bruger? editTarget = null;
     private Bruger editModel = new();   // en kopi der kan bindes til inputs
     private string editFejl = "";
     private bool editSaving = false;
@@ -258,7 +257,6 @@
     private void EditUser(Bruger b)
     {
         editFejl = "";
-        editTarget = b;
         editModel = new Bruger
         {
             Brugerid = b.Brugerid,
@@ -276,7 +274,6 @@
     private void CloseEdit()
     {
         modalRef?.Close();       // lukker ModalDialog-komponenten
-        editTarget = null;
         editFejl = "";
         editSaving = false;
     }
