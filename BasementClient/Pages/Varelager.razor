@@ -1,10 +1,12 @@
 @page "/Varelager"
 @inject HttpClient Http
 @inject AuthService Auth
+@inject IFileService FileService
 @using System.Net.Http.Json
 @using System.Linq   
 @using Core.Models
 @using BasementClient.Components
+@using BasementClient.Services
 
 
 <PageTitle>Varelager</PageTitle>
@@ -32,350 +34,62 @@
 }
 else
 {
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Vare Navn</th>
-                <th>Mængde</th>
-                <th>Lokation</th>
-                <th>Status</th>
-                <th>Beholdningsstatus</th>
-                <th>Handling</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var gruppe in GrupperedeVarer)   
-        {
-            var status = UdløbsStatusHelper.GetStatus(gruppe.Udløbsdato);
-            var melding = UdløbsStatusHelper.GetMelding(gruppe.Udløbsdato);
-            var rowClass = status != "ok" ? $"status-{status}" : "";
-            
-        
-            <tr class="@rowClass">
-                <td>@gruppe.VarerNavn</td>
-                <td>@gruppe.TotalMængde</td>
-                <td>@gruppe.Beholdninger.Count lokationer</td>
-                <td>
-                    @if (! string.IsNullOrEmpty(melding))
-                    {
-                        <span class="status-badge status-@status">@melding</span>
-                    }
-                    else
-                    {
-                        <span style="color: green;">✓ OK</span>
-                    }
-                </td>
-                <td>
-                    @{
-                        var bStatus = BeholdningsStatusHelper.GetStatus(gruppe.TotalMængde, gruppe.MinimumsBeholdning);
-                        var bMelding = BeholdningsStatusHelper.GetMelding(gruppe.TotalMængde, gruppe.MinimumsBeholdning);
-                    }
-                    @if (! string.IsNullOrEmpty(bMelding))
-                    {
-                        <span class="status-badge status-@bStatus">@bMelding</span>
-                    }
-                    else
-                    {
-                        <span style="color:  green;">✓ OK</span>
-                    }
-                </td>
-                <td>
-                    <button class="btn btn-info btn-sm" @onclick="() => OpenDetailsDialog(gruppe.VarerId)">
-                        Se Detaljer
-                    </button>
-
-                    @if (isAdmin)
-                    {
-                        <button class="btn btn-warning btn-sm ms-2" @onclick="() => OpenEditVareDialog(gruppe.VarerId)">
-                            Rediger Vare
-                        </button>
-                    }
-                </td>
-
-                
-            </tr>
-        }
-        </tbody>
-    </table>
+    <VarerlagerTable GrupperedeVarer="@GrupperedeVarer"
+                     IsAdmin="@isAdmin"
+                     OnDetailsClick="@OpenDetailsDialog"
+                     OnEditVareClick="@OpenEditVareDialog" />
 }
 
-@if (showCreateDialog)
-{
-    <div class="modal" style="display:block; background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Opret Ny Vare i Lager</h5>
-                    <button type="button" class="btn-close" @onclick="CloseCreateDialog"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Beholdning ID (genereret automatisk)</label>
-                        <input type="number" class="form-control" @bind="newVarerBeholdning.VarerbeholdId" readonly />
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Vælg Vare</label>
-                        @if (allVarer == null)
-                        {
-                            <p><em>Henter varer...</em></p>
-                        }
-                        else if (allVarer.Count == 0)
-                        {
-                            <p><em>Ingen varer fundet</em></p>
-                        }
-                        else
-                        {
-                            <select class="form-control" @onchange="OnVareSelected">
-                                <option value="">-- Vælg en vare --</option>
-                                @foreach (var vare in allVarer)
-                                {
-                                    <option value="@vare.Varerid">@vare.Navn</option>
-                                }
-                            </select>
-                        }
-                    </div>
+<OpretVareBeholdningModal Show="@showCreateDialog"
+                           NewVarerBeholdning="@newVarerBeholdning"
+                           AllVarer="@allVarer"
+                           SelectedUdløbsdato="@selectedUdløbsdato"
+                           SelectedUdløbsdatoChanged="@((value) => selectedUdløbsdato = value)"
+                           LokationId="@lokationId"
+                           LokationIdChanged="@((value) => lokationId = value)"
+                           LokationNavn="@lokationNavn"
+                           LokationNavnChanged="@((value) => lokationNavn = value)"
+                           OnClose="@CloseCreateDialog"
+                           OnSave="@CreateVarerBeholdning" />
 
-                    <div class="mb-3">
-                        <label class="form-label">Vare ID (tildeles automatisk)</label>
-                        <input type="number" class="form-control" @bind="newVarerBeholdning.VarerId" readonly />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Vare Navn (tildeles automatisk)</label>
-                        <input type="text" class="form-control" @bind="newVarerBeholdning.VarerNavn" readonly />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Mængde</label>
-                        <input type="number" class="form-control" @bind="newVarerBeholdning.Mængde" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Udløbsdato</label>
-                        <input type="date" class="form-control" @bind="selectedUdløbsdato" />
-                    </div>
-                    
-                    <h6 class="mt-3">Lokalitet</h6>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Vælg Lokation</label>
-                        <select class="form-control" @onchange="OnLokationSelected">
-                            <option value="">-- Vælg en lokation --</option>
-                            <option value="1">Bar lager</option>
-                            <option value="2">Sodavands lager</option>
-                            <option value="3">Køkken lager</option>
-                            <option value="4">Bag lager</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Lokation ID (tildeles automatisk)</label>
-                        <input type="number" class="form-control" @bind="lokationId" readonly />
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Lokation Navn (tildeles automatisk)</label>
-                        <input type="text" class="form-control" @bind="lokationNavn" readonly />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseCreateDialog">Annuller</button>
-                    <button type="button" class="btn btn-primary" @onclick="CreateVarerBeholdning">Opret</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-@if (showCreateVareDialog)
-{
-    <div class="modal" style="display:block; background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Opret Helt Ny Vare</h5>
-                    <button type="button" class="btn-close" @onclick="CloseCreateVareDialog"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Navn</label>
-                        <input type="text" class="form-control" @bind="newVare.Navn" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Beskrivelse</label>
-                        <input type="text" class="form-control" @bind="newVare.Beskrivelse" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Enhed (fx Kasse, Flaske)</label>
-                        <input type="text" class="form-control" @bind="newVare.Enhed" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Kategori</label>
-                        <div class="d-flex gap-2">
-                            <select class="form-control" @bind="newVare.Kategorier.kategoriNavn">
-                                <option value="">-- Vælg kategori --</option>
-                                @foreach (var kat in kategoriOptions)
-                                {
-                                    <option value="@kat">@kat</option>
-                                }
-                            </select>
-                            @if (isAdmin)
-                            {
-                                <button type="button" class="btn btn-success" @onclick="OpenNewKategoriDialog" title="Tilføj ny kategori">
-                                    <span>+</span>
-                                </button>
-                            }
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Minimumsbeholdning</label>
-                        <input type="number" class="form-control" @bind="newVare.MinimumsBeholdning" min="0" />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseCreateVareDialog">Annuller</button>
-                    <button type="button" class="btn btn-primary" @onclick="CreateNewVare">Opret Vare</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
+<OpretNyVareModal Show="@showCreateVareDialog"
+                  NewVare="@newVare"
+                  KategoriOptions="@kategoriOptions"
+                  IsAdmin="@isAdmin"
+                  SelectedFile="@selectedFile"
+                  SelectedFileChanged="@((file) => selectedFile = file)"
+                  OnClose="@CloseCreateVareDialog"
+                  OnSave="@CreateNewVare"
+                  OnNewKategoriClick="@OpenNewKategoriDialog" />
 <VareDetailsModal 
     Show="@showDetailsDialog" 
     SelectedVare="@selectedVare" 
     SelectedBeholdninger="@selectedBeholdninger"
-    OnClose="@CloseDetailsDialog"
+    OnClose="@CloseDetailsDialog"   
+    IsAdmin="@isAdmin"
     OnEdit="@HandleEditFromDetails"
     OnDelete="@HandleDeleteFromDetails"/>
 
-@if (showEditDialog && editVarerBeholdning is not null)
-{
-    <div class="modal" style="display:block; background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Rediger vare i lager</h5>
-                    <button type="button" class="btn-close" @onclick="CloseEditDialog"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Beholdning ID</label>
-                        <input type="number" class="form-control" @bind="editVarerBeholdning.VarerbeholdId" readonly />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Vare</label>
-                        <input type="text" class="form-control" @bind="editVarerBeholdning.VarerNavn" readonly />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Mængde</label>
-                        <input type="number" class="form-control" @bind="editVarerBeholdning.Mængde" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Udløbsdato</label>
-                        <input type="date" class="form-control" @bind="editVarerBeholdning.Udløbsdato" />
-                    </div>
-
-                    <h6 class="mt-3">Lokalitet</h6>
-
-                    <div class="mb-3">
-                        <label class="form-label">Vælg Lokation</label>
-                        <select class="form-control" @onchange="OnLokationSelected">
-                            <option value="">-- Vælg en lokation --</option>
-                            <option value="1">Bar lager</option>
-                            <option value="2">Sodavands lager</option>
-                            <option value="3">Køkken lager</option>
-                            <option value="4">Bag lager</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Lokation ID</label>
-                        <input type="number" class="form-control" @bind="lokationId" readonly />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Lokation Navn</label>
-                        <input type="text" class="form-control" @bind="lokationNavn" readonly />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseEditDialog">Annuller</button>
-                    <button type="button" class="btn btn-primary" @onclick="SaveVarerBeholdning">Gem</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-@if (showEditVareDialog)
-{
-    <div class="modal" style="display: block; background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Rediger Vare</h5>
-                    <button type="button" class="btn-close" @onclick="CloseEditVareDialog"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Vare ID</label>
-                        <input type="number" class="form-control" @bind="editVare.Varerid" readonly />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Navn</label>
-                        <input type="text" class="form-control" @bind="editVare.Navn" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Beskrivelse</label>
-                        <input type="text" class="form-control" @bind="editVare.Beskrivelse" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Enhed</label>
-                        <input type="text" class="form-control" @bind="editVare.Enhed" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Minimumsbeholdning</label>
-                        <input type="number" class="form-control" @bind="editVare.MinimumsBeholdning" min="0" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Kategori</label>
-                        <input type="text" class="form-control" @bind="editVare.Kategorier.kategoriNavn" />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseEditVareDialog">Annuller</button>
-                    <button type="button" class="btn btn-primary" @onclick="SaveEditedVare">Gem</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-@if (showNewKategoriDialog)
-{
-    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 1060;">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Opret Ny Kategori</h5>
-                    <button type="button" class="btn-close" @onclick="CloseNewKategoriDialog"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Kategorinavn</label>
-                        <input type="text" class="form-control" @bind="newKategoriNavn" placeholder="Fx: Vin, Snacks..." />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseNewKategoriDialog">Annuller</button>
-                    <button type="button" class="btn btn-primary" @onclick="SaveNewKategori">Gem</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
+<RedigerVareBeholdningModal Show="@showEditDialog"
+                             EditVarerBeholdning="@editVarerBeholdning"
+                             LokationId="@lokationId"
+                             LokationIdChanged="@((value) => lokationId = value)"
+                             LokationNavn="@lokationNavn"
+                             LokationNavnChanged="@((value) => lokationNavn = value)"
+                             OnClose="@CloseEditDialog"
+                             OnSave="@SaveVarerBeholdning" />
+<RedigerVareModal Show="@showEditVareDialog"
+                   EditVare="@editVare"
+                   OnClose="@CloseEditVareDialog"
+                   OnSave="@SaveEditedVare" />
+<NyKategoriModal Show="@showNewKategoriDialog"
+                  NewKategoriNavn="@newKategoriNavn"
+                  NewKategoriNavnChanged="@((value) => newKategoriNavn = value)"
+                  OnClose="@CloseNewKategoriDialog"
+                  OnSave="@SaveNewKategori" />
 
 @code {
+    private IBrowserFile? selectedFile;
     private bool showNewKategoriDialog = false;
     private string newKategoriNavn = "";
     private bool showEditVareDialog = false;
@@ -537,15 +251,35 @@ else
     private void CloseCreateVareDialog()
     {
         showCreateVareDialog = false;
+        selectedFile = null;
     }
+    
     private async Task CreateNewVare()
     {
+        
         // Find det næste ledige ID
         int nextId = (allVarer?.Select(v => v.Varerid).DefaultIfEmpty(0).Max() ?? 0) + 1;
         newVare.Varerid = nextId;
         
-        // Sæt standardværdier hvis nødvendigt
-        if (string.IsNullOrEmpty(newVare.Billede)) newVare.Billede = "no data";
+        // Upload billede hvis valgt
+        if (selectedFile != null)
+        {
+            using var stream = selectedFile.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024); // 5MB max
+            var result = await FileService.SendFile(selectedFile.Name, stream);
+        
+            if (result.success)
+            {
+                newVare.Billede = result.info; // Gem blob navnet
+            }
+            else
+            {
+                newVare.Billede = "upload_failed";
+            }
+        }
+        else
+        {
+            newVare.Billede = "no data";
+        }
         
         // Gem varen via API
         await Http.PostAsJsonAsync("api/varer", newVare);
@@ -553,6 +287,10 @@ else
         // Opdater listen og luk dialog
         await LoadAllVarer();
         BuildKategoriData();
+        
+        // Nulstil selectedFile
+        selectedFile = null;
+        
         CloseCreateVareDialog();
     }
 
@@ -574,46 +312,7 @@ else
         showCreateDialog = false;
     }
 
-    private void OnVareSelected(ChangeEventArgs e)
-    {
-        if (int.TryParse(e.Value?.ToString(), out int vareId) && vareId > 0)
-        {
-            var selectedVareLocal = allVarer?.FirstOrDefault(v => v.Varerid == vareId);
-            if (selectedVareLocal != null)
-            {
-                newVarerBeholdning.VarerId = selectedVareLocal.Varerid;
-                newVarerBeholdning.VarerNavn = selectedVareLocal.Navn;
-                selectedUdløbsdato = selectedVareLocal.Udløbsdato;
-            }
-        }
-        else
-        {
-            newVarerBeholdning.VarerId = 0;
-            newVarerBeholdning.VarerNavn = "";
-            selectedUdløbsdato = DateOnly.FromDateTime(DateTime.Now);
-        }
-    }
 
-    private void OnLokationSelected(ChangeEventArgs e)
-    {
-        if (int.TryParse(e.Value?.ToString(), out int lokId) && lokId > 0)
-        {
-            lokationId = lokId;
-            lokationNavn = lokId switch
-            {
-                1 => "Bar lager",
-                2 => "Sodavands lager",
-                3 => "Køkken lager",
-                4 => "Bag lager",
-                _ => ""
-            };
-        }
-        else
-        {
-            lokationId = 0;
-            lokationNavn = "";
-        }
-    }
 
     private async Task CreateVarerBeholdning()
     {
