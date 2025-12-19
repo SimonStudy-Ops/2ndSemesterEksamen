@@ -1,6 +1,5 @@
 using MongoDB.Driver;
 using Core.Models;
-using System.Collections.Generic;
 
 namespace WebApplication1.Repositories
 {
